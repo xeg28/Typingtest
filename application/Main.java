@@ -29,11 +29,16 @@ import javafx.scene.text.FontWeight;
 import javafx.util.Duration;
 import javafx.event.EventHandler;
 
-
+//TODO: write a new class that creates the GUI to load the users. Create a list.
 public class Main extends Application {
 	private TextField text = new TextField();
 	private Label wpmLabel = new Label();
 	private TextArea quoteTextArea = new TextArea();
+	private Label titleLabel = new Label();
+	private Label avgWPMLabel = new Label();
+	private Users currentUser = new Users("Default User");
+	
+	private PauseTransition wpmPause = new PauseTransition(Duration.millis(100));
 	private long start = 0;
     private int currentQuoteIndex;
     private boolean restart = true;
@@ -47,8 +52,28 @@ public class Main extends Application {
 			BorderPane border = new BorderPane();
 			Scene scene = new Scene(border, 1200, 600);
 			
-			HBox titleHBox = addTitleHBox();
+			HBox titleHBox = addTitleHBox(currentUser);
+			Button createUserBtn = new Button("Create User");
+			titleHBox.getChildren().add(createUserBtn);
 			border.setTop(titleHBox);
+			
+			CreateUser createUser = new CreateUser();
+			Scene createUserWin = createUser.getScene();
+			
+			createUserBtn.setOnMouseClicked(new EventHandler<MouseEvent>() {
+				@Override
+				public void handle(MouseEvent arg0) {
+					primaryStage.setScene(createUserWin);
+					
+				}
+			});
+			createUser.getButton().setOnMouseClicked(new EventHandler<MouseEvent>() {
+				@Override
+				public void handle(MouseEvent arg0) {
+					currentUser.saveUsers(new Users(createUser.getText()));
+					
+				}
+			});
 			
 			HBox wpmHBox = addWPMHBox();
 			border.setRight(wpmHBox);
@@ -90,7 +115,7 @@ public class Main extends Application {
             deleteQuoteButton.setOnMousePressed(new EventHandler<MouseEvent>() {
                 public void handle( MouseEvent arg0) {
                     try {
-                        deleteQuote(write);
+                        deleteQuote(write, currentUser);
                         setRestart(true);
                     }
                     catch (IOException e) {
@@ -111,13 +136,13 @@ public class Main extends Application {
 				public void handle(KeyEvent arg0) {
 	                if (getRestart()) {
 	                    start();
-	                    updateWPM();
+	                    updateWPM(currentUser);
 	                    updateTextHighlight();
 	                    setRestart(false);
 	                }
 	                if (newQuoteKey.match(arg0)) {
 	                    setRestart(true);
-	                    updateWPM();
+	                    wpmLabel.setText("0.0 wpm");
 	                    setRandQuote(write.getQuotes());
 	                    System.out.println("in QuoteKey");
 	                }	
@@ -134,15 +159,15 @@ public class Main extends Application {
 		Application.launch(args);
 	}
 	
-    private void startTypeTest() {
+    private void startTypeTest(Users user) {
         this.start();
-        this.updateWPM();
+        this.updateWPM(user);
         this.updateTextHighlight();
     }
     
     private void setRandQuote( ArrayList<Quote> quotes) {
     	if(quotes.isEmpty()) {
-    		this.quoteTextArea.setText("No quotes left, add a quote. To the get default quotes back"
+    		this.quoteTextArea.setText("No quotes left, add a quote. To get the default quotes back"
     				+ ", delete the Quotes.txt file.");
     	    this.text.clear();
     		return;
@@ -155,18 +180,22 @@ public class Main extends Application {
     }
 	
 	
-	private HBox addTitleHBox() {
+	private HBox addTitleHBox(Users user) {
 	    HBox hbox = new HBox();
 	    hbox.setPadding(new Insets(15, 12, 15, 12));
-	    hbox.setSpacing(10);
+	    hbox.setSpacing(100);
 	    hbox.setStyle("-fx-background-color: #336699;");
-
-	    Label titleLabel = new Label();
-	    titleLabel.setText("Typeracer Clone");
+	    
+	    avgWPMLabel.setText("Average WPM: " + 
+	    	    user.getAvgWPM() + " wpm" );
+	    avgWPMLabel.setFont(Font.font("Helvatica", FontWeight.EXTRA_BOLD, 25));
+	    avgWPMLabel.setStyle("-fx-text-fill: #FFFFFF");
+	    
+	    titleLabel.setText(user.getName());
 	    titleLabel.setFont(Font.font("Helvatica", FontWeight.EXTRA_BOLD, 25));
 	    titleLabel.setStyle("-fx-text-fill: #FFFFFF");
 	    hbox.setAlignment(Pos.CENTER);
-	    hbox.getChildren().addAll(titleLabel);
+	    hbox.getChildren().addAll(titleLabel, avgWPMLabel);
 	    return hbox;
 	}
 	 
@@ -203,19 +232,22 @@ public class Main extends Application {
 	}	
 	
 	
-    private void updateWPM() {
-        PauseTransition pause = new PauseTransition(Duration.millis(100));
-        pause.setOnFinished(event ->{
-        	wpmCalculator();
+    private void updateWPM(Users user) {
+        wpmPause.setOnFinished(event ->{
+        	this.wpmLabel.setText(getWPM()+ " wpm");
         	if(this.text.getText().equals(quoteTextArea.getText())) {
-        		wpmCalculator();
-        		pause.stop();
+        		double finalWPM = getWPM();
+        		user.addTest(finalWPM);
+        		this.avgWPMLabel.setText("Average WPM: " + 
+        				user.getAvgWPM() + " wpm");
+        		this.wpmLabel.setText(finalWPM + " wpm");
+        		wpmPause.stop();
         	}
         	else {
-        		pause.play();
+        		wpmPause.play();
         	}
         });
-        pause.play();
+        wpmPause.play();
       
     }
     
@@ -235,10 +267,10 @@ public class Main extends Application {
     
 
 
-    private void wpmCalculator() {
+    private double getWPM() {
     	DecimalFormat format1 = new DecimalFormat("0.#");
     	double userWPM = Double.parseDouble(format1.format(((this.text.getText().length()/5.0)/elapsedTime())*60));
-    	this.wpmLabel.setText(userWPM + " wpm");
+    	return userWPM;
     }
 
 	private void highlightText() {
@@ -282,11 +314,11 @@ public class Main extends Application {
     	
     }
     
-    private void deleteQuote( QuoteWriter writer) throws IOException {
+    private void deleteQuote( QuoteWriter writer, Users user) throws IOException {
         writer.deleteQuote(this.currentQuoteIndex);
         writer.writeQuote();
         this.setRandQuote(writer.getQuotes());
-        this.startTypeTest();
+        this.startTypeTest(user);
     }
     
     public void start() {
