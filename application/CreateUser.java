@@ -14,7 +14,6 @@ public class CreateUser {
 	private TextField text = new TextField();
 	private Label label = new Label("Enter your username.");
 	private Scene createUserScene;
-	private Stage stage;
 	
 	public CreateUser() {
 		this.vBox.getChildren().addAll(label, text, button);

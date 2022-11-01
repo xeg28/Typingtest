@@ -28,8 +28,9 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.util.Duration;
 import javafx.event.EventHandler;
+import javafx.scene.control.ComboBox;
 
-//TODO: write a new class that creates the GUI to load the users. Create a list.
+//TODO: The list is does not update when you add a user (FIND A FIX)
 public class Main extends Application {
 	private TextField text = new TextField();
 	private Label wpmLabel = new Label();
@@ -39,6 +40,7 @@ public class Main extends Application {
 	private Users currentUser = new Users("Default User");
 	
 	private PauseTransition wpmPause = new PauseTransition(Duration.millis(100));
+	private PauseTransition highlightPause = new PauseTransition(Duration.millis(1));
 	private long start = 0;
     private int currentQuoteIndex;
     private boolean restart = true;
@@ -52,9 +54,36 @@ public class Main extends Application {
 			BorderPane border = new BorderPane();
 			Scene scene = new Scene(border, 1200, 600);
 			
-			HBox titleHBox = addTitleHBox(currentUser);
+			HBox titleHBox = addTitleHBox();
 			Button createUserBtn = new Button("Create User");
-			titleHBox.getChildren().add(createUserBtn);
+			Button loadUserBtn = new Button("Load User");
+			
+			currentUser.loadUsers();
+			LoadUser loadUser = new LoadUser(currentUser.getUsers());
+			Scene loadUserWin = loadUser.getScene();
+			
+			loadUserBtn.setOnMouseClicked(new EventHandler<MouseEvent>() {
+				@Override
+				public void handle(MouseEvent arg0) {
+					primaryStage.setScene(loadUserWin);
+				}
+			});
+			
+			loadUser.getButton().setOnMouseClicked(new EventHandler<MouseEvent>() {
+				@Override
+				public void handle(MouseEvent arg0) {
+					if(loadUser.getComboBox().getValue() != null) {
+						loadUser.getComboBox().getValue().setUsers(currentUser.getUsers());
+						currentUser = loadUser.getComboBox().getValue();
+						titleLabel.setText(currentUser.getName());
+						avgWPMLabel.setText("Average WPM: " + 
+        				currentUser.getAvgWPM() + " wpm");
+						primaryStage.setScene(scene);
+					}
+				}
+			});
+			
+			titleHBox.getChildren().addAll(createUserBtn, loadUserBtn);
 			border.setTop(titleHBox);
 			
 			CreateUser createUser = new CreateUser();
@@ -70,8 +99,10 @@ public class Main extends Application {
 			createUser.getButton().setOnMouseClicked(new EventHandler<MouseEvent>() {
 				@Override
 				public void handle(MouseEvent arg0) {
-					currentUser.saveUsers(new Users(createUser.getText()));
-					
+					Users newUser = new Users(createUser.getText());
+					currentUser.saveUsers(newUser);
+					loadUser.getComboBox().getItems().add(newUser);
+					primaryStage.setScene(scene);
 				}
 			});
 			
@@ -115,7 +146,7 @@ public class Main extends Application {
             deleteQuoteButton.setOnMousePressed(new EventHandler<MouseEvent>() {
                 public void handle( MouseEvent arg0) {
                     try {
-                        deleteQuote(write, currentUser);
+                        deleteQuote(write);
                         setRestart(true);
                     }
                     catch (IOException e) {
@@ -136,7 +167,7 @@ public class Main extends Application {
 				public void handle(KeyEvent arg0) {
 	                if (getRestart()) {
 	                    start();
-	                    updateWPM(currentUser);
+	                    updateWPM();
 	                    updateTextHighlight();
 	                    setRestart(false);
 	                }
@@ -159,9 +190,9 @@ public class Main extends Application {
 		Application.launch(args);
 	}
 	
-    private void startTypeTest(Users user) {
+    private void startTypeTest() {
         this.start();
-        this.updateWPM(user);
+        this.updateWPM();
         this.updateTextHighlight();
     }
     
@@ -180,18 +211,18 @@ public class Main extends Application {
     }
 	
 	
-	private HBox addTitleHBox(Users user) {
+	private HBox addTitleHBox() {
 	    HBox hbox = new HBox();
 	    hbox.setPadding(new Insets(15, 12, 15, 12));
-	    hbox.setSpacing(100);
+	    hbox.setSpacing(75);
 	    hbox.setStyle("-fx-background-color: #336699;");
 	    
 	    avgWPMLabel.setText("Average WPM: " + 
-	    	    user.getAvgWPM() + " wpm" );
+	    	    currentUser.getAvgWPM() + " wpm" );
 	    avgWPMLabel.setFont(Font.font("Helvatica", FontWeight.EXTRA_BOLD, 25));
 	    avgWPMLabel.setStyle("-fx-text-fill: #FFFFFF");
 	    
-	    titleLabel.setText(user.getName());
+	    titleLabel.setText(currentUser.getName());
 	    titleLabel.setFont(Font.font("Helvatica", FontWeight.EXTRA_BOLD, 25));
 	    titleLabel.setStyle("-fx-text-fill: #FFFFFF");
 	    hbox.setAlignment(Pos.CENTER);
@@ -232,14 +263,15 @@ public class Main extends Application {
 	}	
 	
 	
-    private void updateWPM(Users user) {
+    private void updateWPM() {
         wpmPause.setOnFinished(event ->{
         	this.wpmLabel.setText(getWPM()+ " wpm");
         	if(this.text.getText().equals(quoteTextArea.getText())) {
         		double finalWPM = getWPM();
-        		user.addTest(finalWPM);
+        		currentUser.addTest(finalWPM);
+        		currentUser.updateAndSave(currentUser);
         		this.avgWPMLabel.setText("Average WPM: " + 
-        				user.getAvgWPM() + " wpm");
+        				currentUser.getAvgWPM() + " wpm");
         		this.wpmLabel.setText(finalWPM + " wpm");
         		wpmPause.stop();
         	}
@@ -252,17 +284,16 @@ public class Main extends Application {
     }
     
     private void updateTextHighlight() {
-        PauseTransition pause = new PauseTransition(Duration.millis(1));
-        pause.setOnFinished(event ->{
+    	highlightPause.setOnFinished(event ->{
         	highlightText();
         	if(this.text.getText().equals(quoteTextArea.getText())) {
-        		pause.stop();
+        		highlightPause.stop();
         	}
         	else {
-        		pause.play();
+        		highlightPause.play();
         	}
         });
-        pause.play();
+    	highlightPause.play();
     }
     
 
@@ -314,11 +345,11 @@ public class Main extends Application {
     	
     }
     
-    private void deleteQuote( QuoteWriter writer, Users user) throws IOException {
+    private void deleteQuote( QuoteWriter writer) throws IOException {
         writer.deleteQuote(this.currentQuoteIndex);
         writer.writeQuote();
         this.setRandQuote(writer.getQuotes());
-        this.startTypeTest(user);
+        this.startTypeTest();
     }
     
     public void start() {
