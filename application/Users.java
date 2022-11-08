@@ -15,6 +15,7 @@ import java.util.Collections;
 public class Users implements Serializable{
 	private String name;
 	private double avgWPM = 0;
+	private double bestWPM = 0;
 	private ArrayList<Double> lastTenTests = new ArrayList<>();
 	private ArrayList<Users> users = new ArrayList<>();	
 	private static final long serialVersionUID = 6529685098267757690L;
@@ -24,6 +25,9 @@ public class Users implements Serializable{
 	}
 	
 	public void addTest(double test) {
+		if(test > this.bestWPM) {
+			this.bestWPM = test;
+		}
 		if(this.lastTenTests.size() == 10) {
 			this.lastTenTests.remove(0);
 			this.lastTenTests.add(test);
@@ -33,6 +37,14 @@ public class Users implements Serializable{
 			this.lastTenTests.add(test);
 			System.out.println(lastTenTests);
 		}
+	}
+	
+	private void setBestWPM(double best) {
+		this.bestWPM = best;
+	}
+	
+	public double getBestWPM() {
+		return bestWPM;		
 	}
 	
 	private void setAvgWPM() {
@@ -62,6 +74,10 @@ public class Users implements Serializable{
 	
 	public void addUser(Users user) {
 		this.users.add(user);
+	}
+	
+	public void deleteUser(Users user) {
+		this.users.remove(user);
 	}
 	
 	public void loadUsers() {

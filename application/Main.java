@@ -30,13 +30,13 @@ import javafx.util.Duration;
 import javafx.event.EventHandler;
 import javafx.scene.control.ComboBox;
 
-//TODO: The list is does not update when you add a user (FIND A FIX)
+//TODO: Make the program automatically switch users when a user is deleted.
 public class Main extends Application {
 	private TextField text = new TextField();
 	private Label wpmLabel = new Label();
 	private TextArea quoteTextArea = new TextArea();
 	private Label titleLabel = new Label();
-	private Label avgWPMLabel = new Label();
+	private Label userWPMDataLabel = new Label();
 	private Users currentUser = new Users("Default User");
 	
 	private PauseTransition wpmPause = new PauseTransition(Duration.millis(100));
@@ -51,6 +51,8 @@ public class Main extends Application {
 		try {
 			Image icon = new Image(this.getClass().getResourceAsStream("/images/icon.png"));
             primaryStage.getIcons().add((Image)icon);
+            primaryStage.centerOnScreen();
+            
 			BorderPane border = new BorderPane();
 			Scene scene = new Scene(border, 1200, 600);
 			
@@ -58,27 +60,37 @@ public class Main extends Application {
 			Button createUserBtn = new Button("Create User");
 			Button loadUserBtn = new Button("Load User");
 			
+			
 			currentUser.loadUsers();
 			LoadUser loadUser = new LoadUser(currentUser.getUsers());
-			Scene loadUserWin = loadUser.getScene();
+			Stage loadUserStage = loadUser.getStage();
 			
 			loadUserBtn.setOnMouseClicked(new EventHandler<MouseEvent>() {
 				@Override
 				public void handle(MouseEvent arg0) {
-					primaryStage.setScene(loadUserWin);
+					loadUserStage.show();
 				}
 			});
 			
-			loadUser.getButton().setOnMouseClicked(new EventHandler<MouseEvent>() {
+			loadUser.getDeleteButton().setOnMouseClicked(new EventHandler<MouseEvent>() {
+				@Override
+				public void handle(MouseEvent arg0) {
+					Users removedUser = loadUser.getComboBox().getValue();
+					currentUser.deleteUser(removedUser);
+					loadUser.getComboBox().getItems().remove(removedUser);
+				}
+			});
+			
+			loadUser.getSelectButton().setOnMouseClicked(new EventHandler<MouseEvent>() {
 				@Override
 				public void handle(MouseEvent arg0) {
 					if(loadUser.getComboBox().getValue() != null) {
 						loadUser.getComboBox().getValue().setUsers(currentUser.getUsers());
 						currentUser = loadUser.getComboBox().getValue();
 						titleLabel.setText(currentUser.getName());
-						avgWPMLabel.setText("Average WPM: " + 
-        				currentUser.getAvgWPM() + " wpm");
-						primaryStage.setScene(scene);
+						userWPMDataLabel.setText("Highest WPM: " + currentUser.getBestWPM() + 
+						" wpm"+ "\t\tAverage WPM: " + currentUser.getAvgWPM() + " wpm");
+						loadUserStage.close();
 					}
 				}
 			});
@@ -87,22 +99,27 @@ public class Main extends Application {
 			border.setTop(titleHBox);
 			
 			CreateUser createUser = new CreateUser();
-			Scene createUserWin = createUser.getScene();
+			Stage createUserStage = createUser.getStage();
 			
 			createUserBtn.setOnMouseClicked(new EventHandler<MouseEvent>() {
 				@Override
 				public void handle(MouseEvent arg0) {
-					primaryStage.setScene(createUserWin);
+					createUserStage.show();
 					
 				}
 			});
 			createUser.getButton().setOnMouseClicked(new EventHandler<MouseEvent>() {
 				@Override
 				public void handle(MouseEvent arg0) {
-					Users newUser = new Users(createUser.getText());
-					currentUser.saveUsers(newUser);
-					loadUser.getComboBox().getItems().add(newUser);
-					primaryStage.setScene(scene);
+					if(createUser.getText().length() <= 17) {
+						Users newUser = new Users(createUser.getText());
+						currentUser.saveUsers(newUser);
+						loadUser.getComboBox().getItems().add(newUser);
+						createUser.getStage().close();
+					}
+					else {
+						createUser.getLabel().setText("Enter a name less than 17 characters");
+					}
 				}
 			});
 			
@@ -119,14 +136,19 @@ public class Main extends Application {
 			
 			
 			TextField addQuoteText = new TextField();
+			addQuoteText.setPromptText("Enter a quote.");
 			lowerVbox.getChildren().addAll(addQuoteText, addQuoteBtn);
 			
 			QuoteWriter write = new QuoteWriter();
 			addQuoteBtn.setOnMouseClicked(new EventHandler<MouseEvent>() {
 				@Override
 				public void handle(MouseEvent arg0) {
-					if(addQuoteText.getText().length() != 0) {
+					if(addQuoteText.getText().length() >= 44) {
 						write.writeQuote(addQuoteText.getText());
+						addQuoteText.setPromptText("Enter a quote.");
+					}
+					else {
+						addQuoteText.setPromptText("Quote must have 44 or more characters.");
 					}
 					try {
 						write.readQuote();
@@ -214,19 +236,20 @@ public class Main extends Application {
 	private HBox addTitleHBox() {
 	    HBox hbox = new HBox();
 	    hbox.setPadding(new Insets(15, 12, 15, 12));
-	    hbox.setSpacing(75);
+	    hbox.setSpacing(50);
 	    hbox.setStyle("-fx-background-color: #336699;");
 	    
-	    avgWPMLabel.setText("Average WPM: " + 
-	    	    currentUser.getAvgWPM() + " wpm" );
-	    avgWPMLabel.setFont(Font.font("Helvatica", FontWeight.EXTRA_BOLD, 25));
-	    avgWPMLabel.setStyle("-fx-text-fill: #FFFFFF");
+		userWPMDataLabel.setText("Highest WPM: " + currentUser.getBestWPM() + 
+		" wpm"+ "\t\tAverage WPM: " + currentUser.getAvgWPM() + " wpm");
+	    userWPMDataLabel.setFont(Font.font("Helvatica", FontWeight.EXTRA_BOLD, 20));
+	    userWPMDataLabel.setStyle("-fx-text-fill: #FFFFFF");
+	    userWPMDataLabel.setPrefWidth(600);
 	    
 	    titleLabel.setText(currentUser.getName());
-	    titleLabel.setFont(Font.font("Helvatica", FontWeight.EXTRA_BOLD, 25));
+	    titleLabel.setFont(Font.font("Helvatica", FontWeight.BOLD, 25));
 	    titleLabel.setStyle("-fx-text-fill: #FFFFFF");
 	    hbox.setAlignment(Pos.CENTER);
-	    hbox.getChildren().addAll(titleLabel, avgWPMLabel);
+	    hbox.getChildren().addAll(titleLabel, userWPMDataLabel);
 	    return hbox;
 	}
 	 
@@ -262,18 +285,26 @@ public class Main extends Application {
         return vbox;
 	}	
 	
+	private void endOfTest(double finalWPM) {
+		currentUser.addTest(finalWPM);
+		currentUser.updateAndSave(currentUser);
+		
+		userWPMDataLabel.setText("Highest WPM: " + currentUser.getBestWPM() +  
+		" wpm"+ "\t\tAverage WPM: " + currentUser.getAvgWPM() + " wpm");
+		
+		this.wpmLabel.setText(finalWPM + " wpm");
+		System.out.println(userWPMDataLabel.getWidth());
+		this.quoteTextArea.clear();
+		this.quoteTextArea.setText("Press CTRL+ALT+K to go to the next test.");
+		wpmPause.stop();
+	}
 	
     private void updateWPM() {
         wpmPause.setOnFinished(event ->{
         	this.wpmLabel.setText(getWPM()+ " wpm");
         	if(this.text.getText().equals(quoteTextArea.getText())) {
         		double finalWPM = getWPM();
-        		currentUser.addTest(finalWPM);
-        		currentUser.updateAndSave(currentUser);
-        		this.avgWPMLabel.setText("Average WPM: " + 
-        				currentUser.getAvgWPM() + " wpm");
-        		this.wpmLabel.setText(finalWPM + " wpm");
-        		wpmPause.stop();
+        		endOfTest(finalWPM);
         	}
         	else {
         		wpmPause.play();
