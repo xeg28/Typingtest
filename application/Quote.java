@@ -11,11 +11,11 @@ public class Quote implements Serializable
     public Quote() {
     }
     
-    public Quote(final String quote) {
+    public Quote(String quote) {
         this.quote = quote;
     }
     
-    public void setQuote(final String quote) {
+    public void setQuote(String quote) {
         this.quote = quote;
     }
     

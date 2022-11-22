@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
+import javafx.animation.Animation;
 import javafx.animation.PauseTransition;
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -30,7 +31,10 @@ import javafx.util.Duration;
 import javafx.event.EventHandler;
 import javafx.scene.control.ComboBox;
 
+//TODO: When a quote is deleted, delete the quote from users in uniqueQuotesTyped and topTenQuoteTests
 //TODO: Make the program automatically switch users when a user is deleted.
+//TODO: Make a random quote appear when a new user is selected or deleted.
+
 public class Main extends Application {
 	private TextField text = new TextField();
 	private Label wpmLabel = new Label();
@@ -61,8 +65,9 @@ public class Main extends Application {
 			Button loadUserBtn = new Button("Load User");
 			
 			
-			currentUser.loadUsers();
-			LoadUser loadUser = new LoadUser(currentUser.getUsers());
+			Users.loadUsers();
+			Users.update(new ArrayList<Users>(Users.getUsers()));
+			LoadUser loadUser = new LoadUser(Users.getUsers());
 			Stage loadUserStage = loadUser.getStage();
 			
 			loadUserBtn.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -76,7 +81,8 @@ public class Main extends Application {
 				@Override
 				public void handle(MouseEvent arg0) {
 					Users removedUser = loadUser.getComboBox().getValue();
-					currentUser.deleteUser(removedUser);
+					Users.deleteUser(removedUser);
+					currentUser.updateAndSave(currentUser);
 					loadUser.getComboBox().getItems().remove(removedUser);
 				}
 			});
@@ -85,7 +91,7 @@ public class Main extends Application {
 				@Override
 				public void handle(MouseEvent arg0) {
 					if(loadUser.getComboBox().getValue() != null) {
-						loadUser.getComboBox().getValue().setUsers(currentUser.getUsers());
+						//loadUser.getComboBox().getValue().setUsers(currentUser.getUsers());
 						currentUser = loadUser.getComboBox().getValue();
 						titleLabel.setText(currentUser.getName());
 						userWPMDataLabel.setText("Highest WPM: " + currentUser.getBestWPM() + 
@@ -111,9 +117,12 @@ public class Main extends Application {
 			createUser.getButton().setOnMouseClicked(new EventHandler<MouseEvent>() {
 				@Override
 				public void handle(MouseEvent arg0) {
-					if(createUser.getText().length() <= 17) {
+					if(nameInUsers(createUser.getText())) {
+						createUser.getLabel().setText("Username taken");
+					}
+					else if(createUser.getText().length() <= 17) {
 						Users newUser = new Users(createUser.getText());
-						currentUser.saveUsers(newUser);
+						Users.saveUsers(newUser);
 						loadUser.getComboBox().getItems().add(newUser);
 						createUser.getStage().close();
 					}
@@ -157,7 +166,7 @@ public class Main extends Application {
 						}
 						addQuoteText.clear();
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
+
 						e.printStackTrace();
 					}
 				}
@@ -189,7 +198,7 @@ public class Main extends Application {
 				public void handle(KeyEvent arg0) {
 	                if (getRestart()) {
 	                    start();
-	                    updateWPM();
+	                    updateWPM(write.getQuotes().get(currentQuoteIndex));
 	                    updateTextHighlight();
 	                    setRestart(false);
 	                }
@@ -212,9 +221,19 @@ public class Main extends Application {
 		Application.launch(args);
 	}
 	
-    private void startTypeTest() {
+	public static boolean nameInUsers(String name) {
+		ArrayList<Users> users = Users.getUsers();
+		for(int i = 0; i < users.size(); i++) {
+			if(users.get(i).getName().equals(name)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+    private void startTypeTest(Quote quote) {
         this.start();
-        this.updateWPM();
+        this.updateWPM(quote);
         this.updateTextHighlight();
     }
     
@@ -285,26 +304,24 @@ public class Main extends Application {
         return vbox;
 	}	
 	
-	private void endOfTest(double finalWPM) {
-		currentUser.addTest(finalWPM);
+	private void endOfTest(double finalWPM, Quote quote) {
+		currentUser.addTest(finalWPM, quote);
 		currentUser.updateAndSave(currentUser);
 		
 		userWPMDataLabel.setText("Highest WPM: " + currentUser.getBestWPM() +  
 		" wpm"+ "\t\tAverage WPM: " + currentUser.getAvgWPM() + " wpm");
 		
 		this.wpmLabel.setText(finalWPM + " wpm");
-		System.out.println(userWPMDataLabel.getWidth());
-		this.quoteTextArea.clear();
-		this.quoteTextArea.setText("Press CTRL+ALT+K to go to the next test.");
+		setEndOfTestString(currentUser.getTopTenQuoteTests(currentUser.getQuoteIndex(quote)));
 		wpmPause.stop();
 	}
 	
-    private void updateWPM() {
+    private void updateWPM(Quote quote) {
         wpmPause.setOnFinished(event ->{
         	this.wpmLabel.setText(getWPM()+ " wpm");
         	if(this.text.getText().equals(quoteTextArea.getText())) {
         		double finalWPM = getWPM();
-        		endOfTest(finalWPM);
+        		endOfTest(finalWPM, quote);
         	}
         	else {
         		wpmPause.play();
@@ -318,10 +335,18 @@ public class Main extends Application {
     	highlightPause.setOnFinished(event ->{
         	highlightText();
         	if(this.text.getText().equals(quoteTextArea.getText())) {
+        		System.out.println("updateTextHighlight");
+        		this.quoteTextArea.deselect();
+        		this.quoteTextArea.setStyle("-fx-text-fill: #000000");
         		highlightPause.stop();
         	}
-        	else {
+        	else if(wpmPause.getStatus() != Animation.Status.STOPPED){
         		highlightPause.play();
+        	}
+        	else {
+        		this.quoteTextArea.deselect();
+        		this.quoteTextArea.setStyle("-fx-text-fill: #000000");
+        		highlightPause.stop();
         	}
         });
     	highlightPause.play();
@@ -376,18 +401,34 @@ public class Main extends Application {
     	
     }
     
+    private void setEndOfTestString(ArrayList<Double> topTests) {
+    	StringBuilder sb = new StringBuilder();
+    	sb.append("Your top five tests for this quote.\n");
+    	
+    	for(int j = 1, i = topTests.size() - 1; i >= 0; i--, j++) {
+    		sb.append("" + j + ". " + topTests.get(i) + " wpm\n");
+    	}
+   
+    	sb.append("\nPress CTRL+ALT+K to go to the next test.");
+    	
+    	this.quoteTextArea.clear();
+    	this.quoteTextArea.setText(sb.toString());
+    }
+    
     private void deleteQuote( QuoteWriter writer) throws IOException {
+    	Users.deleteUniqueQuote(writer.getQuotes().get(this.currentQuoteIndex));
         writer.deleteQuote(this.currentQuoteIndex);
         writer.writeQuote();
         this.setRandQuote(writer.getQuotes());
-        this.startTypeTest();
+        this.startTypeTest(writer.getQuotes().get(this.currentQuoteIndex));
     }
+    
     
     public void start() {
     	this.start = System.nanoTime();
     }
     
-    public void setRestart( boolean bool) {
+    public void setRestart(boolean bool) {
         this.restart = bool;
     }
     
