@@ -1,2 +1,2 @@
-# TyperacerClone
-This project is a clone of typeracer website. It does not look the same as the website but it is meant to work in the same way minus the racing against other players. So it is pretty much typeracer in practice mode with a couple of additional features. 
+# Typingtest
+This is a personal project that is made to practice my ability to program in java. This program tests the user's typing speed and gives users the ability to makeup their own quotes to type. I am updating the project from time to time to fix any bugs and add more features. 
