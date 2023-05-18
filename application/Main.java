@@ -314,7 +314,7 @@ public class Main extends Application {
 		" wpm"+ "\t\tAverage WPM: " + currentUser.getAvgWPM() + " wpm");
 		
 		this.wpmLabel.setText(finalWPM + " wpm");
-		setEndOfTestString(currentUser.getTopTenQuoteTests(currentUser.getQuoteIndex(quote)));
+		setEndOfTestString(currentUser.getTopTenQuoteTests(currentUser.getQuoteIndex(quote)), quote);
 		wpmPause.stop();
 	}
 	
@@ -403,15 +403,17 @@ public class Main extends Application {
     	
     }
     
-    private void setEndOfTestString(ArrayList<Double> topTests) {
+    private void setEndOfTestString(ArrayList<Double> topTests, Quote quote) {
     	StringBuilder sb = new StringBuilder();
     	sb.append("Your top five tests for this quote.\n");
     	
     	for(int j = 1, i = topTests.size() - 1; i >= 0; i--, j++) {
     		sb.append("" + j + ". " + topTests.get(i) + " wpm\n");
     	}
+    	if(quote.highestUser == null) {sb.append("\nTop Test: N/A");}
+    	else {sb.append("\nTop Test: " + quote.highestUser + " at " + quote.highestTest + "wpm");}
    
-    	sb.append("\nPress CTRL+ALT+K to go to the next test.");
+    	sb.append("\n\nPress CTRL+ALT+K to go to the next test.");
     	
     	this.quoteTextArea.clear();
     	this.quoteTextArea.setText(sb.toString());
@@ -420,7 +422,7 @@ public class Main extends Application {
     private void deleteQuote( QuoteWriter writer) throws IOException {
     	Users.deleteUniqueQuote(writer.getQuotes().get(this.currentQuoteIndex));
         writer.deleteQuote(this.currentQuoteIndex);
-        writer.writeQuote();
+        QuoteWriter.writeQuote();
         this.setRandQuote(writer.getQuotes());
         this.startTypeTest(writer.getQuotes().get(this.currentQuoteIndex));
     }

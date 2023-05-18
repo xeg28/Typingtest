@@ -13,40 +13,53 @@ import java.util.ArrayList;
 
 public class QuoteWriter
 {
-    private ArrayList<Quote> quotes;
-    private String dir;
-    private File newFile;
+    static private ArrayList<Quote> quotes;
+    static private String dir;
     
     QuoteWriter() {
-        this.quotes = new ArrayList<Quote>();
-        this.dir = System.getProperty("user.dir");
-        this.newFile = new File(String.valueOf(this.dir) + "\\Quotes.txt");
+        quotes = new ArrayList<Quote>();
+        dir = System.getProperty("user.dir");
+    }
+   
+    public static int findQuote(String quote) {
+    	for(int i = 0; i < quotes.size(); i++) {
+    		if(quote.equals(quotes.get(i).toString())) {
+    			return i;
+    		}
+    	}
+    	return -1;
+    }
+    
+    public static void updateAndSave(Quote quote) {
+    	quotes.set(findQuote(quote.toString()), quote);
+    	writeQuote();
+    	
     }
     
     public void writeQuote(String newQuote) {
         try {
             Quote quote = new Quote(newQuote);
-            this.quotes.add(quote);
-            FileOutputStream file = new FileOutputStream(this.newFile);
+            quotes.add(quote);
+            FileOutputStream file = new FileOutputStream(new File(String.valueOf(dir) + "\\Quotes.txt"));
             ObjectOutputStream oStream = new ObjectOutputStream(file);
             oStream.writeObject(this.quotes);
             file.close();
             oStream.close();
-            this.readQuote();
+            readQuote();
         }
         catch (IOException e) {
             e.printStackTrace();
         }
     }
     
-    public void writeQuote() {
+    public static void writeQuote() {
         try {
-            FileOutputStream file = new FileOutputStream(this.newFile);
+            FileOutputStream file = new FileOutputStream(new File(String.valueOf(dir) + "\\Quotes.txt"));
             ObjectOutputStream oStream = new ObjectOutputStream(file);
-            oStream.writeObject(this.quotes);
+            oStream.writeObject(quotes);
             file.close();
             oStream.close();
-            this.readQuote();
+            readQuote();
         }
         catch (IOException e) {
             e.printStackTrace();
@@ -60,17 +73,18 @@ public class QuoteWriter
         this.quotes.remove(index);
     }
     
-    public void readQuote() throws IOException {
+    public static void readQuote() throws IOException {
         try {
-            FileInputStream fileInputStream = new FileInputStream(this.newFile);
+            FileInputStream fileInputStream = new FileInputStream(new File(String.valueOf(dir) + "\\Quotes.txt"));
             ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
-            this.quotes = (ArrayList<Quote>)objectInputStream.readObject();
+            quotes = (ArrayList<Quote>)objectInputStream.readObject();
         }
         catch (FileNotFoundException e2) {
-            this.newFile.createNewFile();
-            this.writeQuote("When he utilizes combined energy, his fighting men become as it were like unto rolling logs or stones. For it is the nature of a log or stone to remain motionless on level ground, and to move when on a slope; if four-cornered, to come to a standstill, but if round-shaped, to go rolling down.");
-            this.writeQuote("But I try not to think with my gut. If I'm serious about understanding the world, thinking with anything besides my brain, as tempting as that might be, is likely to get me into trouble.");
-            this.writeQuote("I don't want to live someone else's idea of how to live. Don't ask me to do that. I don't want to find out one day that I'm at the end of someone else's life.");
+        	new File(String.valueOf(dir) + "\\Quotes.txt").createNewFile();
+            quotes.add(new Quote("When he utilizes combined energy, his fighting men become as it were like unto rolling logs or stones. For it is the nature of a log or stone to remain motionless on level ground, and to move when on a slope; if four-cornered, to come to a standstill, but if round-shaped, to go rolling down."));
+            quotes.add(new Quote("But I try not to think with my gut. If I'm serious about understanding the world, thinking with anything besides my brain, as tempting as that might be, is likely to get me into trouble."));
+            quotes.add(new Quote("I don't want to live someone else's idea of how to live. Don't ask me to do that. I don't want to find out one day that I'm at the end of someone else's life."));
+            writeQuote();
         }
         catch (ClassNotFoundException e) {
             e.printStackTrace();

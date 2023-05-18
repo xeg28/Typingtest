@@ -90,6 +90,8 @@ public class Users implements Serializable{
 			}
 		}
 		
+		addIfHighestForQuote(test, quote);
+		
 		if(test > this.bestWPM) {
 			this.bestWPM = test;
 		}
@@ -102,6 +104,15 @@ public class Users implements Serializable{
 		else {
 			this.lastTenTests.add(test);
 			System.out.println(lastTenTests);
+		}
+	}
+	
+	
+	private void addIfHighestForQuote(double test, Quote quote) {
+		if(quote.highestTest <= test && !this.name.equals("Default User")) {
+			quote.highestTest = test;
+			quote.highestUser = this.name;
+			QuoteWriter.updateAndSave(quote);
 		}
 	}
 	
