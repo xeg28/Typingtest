@@ -1,0 +1,9 @@
+.correctHighlight {
+    -fx-highlight-fill: #90EE90; /* Set the background color of the highlighted text */
+    -fx-highlight-text-fill: #006400; /* Set the text color of the highlighted text */
+}
+
+.errorHighlight {
+    -fx-highlight-fill: #FF7F7F; /* Set the background color of the highlighted text */
+    -fx-highlight-text-fill: #ab061e; /* Set the text color of the highlighted text */
+}
