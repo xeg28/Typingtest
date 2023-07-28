@@ -1,5 +1,7 @@
 package com.views.addquote;
 
+import com.controllers.listquotes.ListQuotesController;
+import com.views.listquotes.ListQuotes;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -12,8 +14,11 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
+import java.util.List;
+
 public class AddQuote {
     private static Scene scene;
+    private static Scene lastScene;
     public static BorderPane border;
     private static VBox body = new VBox();
     public static TextArea quoteTitle = new TextArea();
@@ -55,6 +60,15 @@ public class AddQuote {
             quoteTitle.setPrefHeight(quoteTitleHeight);
             quote.setPrefHeight(quoteTextHeight);
         });
+    }
+
+    public static void setLastScene(Scene prevScene) {
+        if(prevScene != scene)
+            lastScene = prevScene;
+    }
+
+    public static Scene getLastScene() {
+        return lastScene;
     }
 
     public static Scene getScene() {

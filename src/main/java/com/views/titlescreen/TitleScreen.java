@@ -1,7 +1,6 @@
 package com.views.titlescreen;
 
 import com.helpers.QuoteHelper;
-import com.models.Quote;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -25,7 +24,7 @@ public class TitleScreen {
 
     public static TextArea quoteTextArea = new TextArea();
     public static Label wpmLabel = new Label("0.0 wpm");
-    public static Button deleteQuoteBtn = new Button("Delete Quote");
+    public static Button quoteListBtn = new Button("Select Quote");
     public static TextField testQuote = new TextField();
     public static Button testQuoteBtn = new Button("Test Quote");
 
@@ -48,12 +47,12 @@ public class TitleScreen {
         top.getChildren().add(innerTop);
         top.setSpacing(10);
         top.setPrefHeight(412);
-        top.getChildren().add(deleteQuoteBtn);
+        top.getChildren().add(quoteListBtn);
         body.heightProperty().addListener((observable, oldHeight, newHeight) -> {
             if(top.getHeight() != 0.0) {
                 double topHeight = newHeight.doubleValue() - 60 - bottom.getHeight();
                 top.setPrefHeight(topHeight);
-                double quoteTextAreaHeight = topHeight - 10 - deleteQuoteBtn.getHeight();
+                double quoteTextAreaHeight = topHeight - 10 - quoteListBtn.getHeight();
                 quoteTextArea.setPrefHeight(quoteTextAreaHeight);
             }
         });

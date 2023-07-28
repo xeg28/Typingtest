@@ -1,7 +1,9 @@
 package com.controllers.titlescreen;
 
+import com.helpers.QuoteHelper;
 import com.helpers.TypingTestHelper;
 import com.typingtest.Main;
+import com.views.listquotes.ListQuotes;
 import com.views.template.Header;
 import com.views.testresults.TestResults;
 import com.views.titlescreen.TitleScreen;
@@ -28,9 +30,8 @@ public class TitleScreenController {
 
     private static TextArea quoteTextArea = TitleScreen.quoteTextArea;
     private static Label wpmLabel = TitleScreen.wpmLabel;
-    private static Button delBtn =  TitleScreen.deleteQuoteBtn;
+    private static Button quoteListBtn =  TitleScreen.quoteListBtn;
     private static TextField testQuoteTextField = TitleScreen.testQuote;
-    private static Button addQuoteBtn;
     private static Button testQuoteBtn = TitleScreen.testQuoteBtn;
     private static boolean testIsOngoing = false;
 
@@ -44,6 +45,7 @@ public class TitleScreenController {
     public static void setHandlersForTitleScreen() {
         quoteTextAreaHandler();
         newQuoteHandler();
+        quoteListBtnHandler();
     }
 
     public static void newQuoteHandler() {
@@ -60,6 +62,21 @@ public class TitleScreenController {
                     quoteTextArea.setText(newQuote);
                 }
 
+            }
+        });
+    }
+
+    public static void quoteListBtnHandler() {
+        quoteListBtn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                if(testIsOngoing) {
+                    stopTest();
+                }
+                QuoteHelper.addQuotesToList();
+                ListQuotes.setLastScene(Main.primaryStage.getScene());
+                ListQuotes.getBorder().setTop(Header.getHeader());
+                Main.primaryStage.setScene(ListQuotes.getScene());
             }
         });
     }
@@ -132,19 +149,14 @@ public class TitleScreenController {
         highlightPause.setOnFinished(event ->{
             TypingTestHelper.highlightText(userTyped, quoteTextArea);
             if(userTyped.toString().equals(quoteTextArea.getText())) {
-
                 highlightPause.stop();
-                return;
+                wpmLabel.setText(TypingTestHelper.getWPM(userTyped.length())+ " wpm");
+                resultSceneChange();
+                stopTest();
             }
-//            else if(wpmPause.getStatus() != Animation.Status.STOPPED){
-//                highlightPause.play();
-//            }
-//            else {
-//                quoteTextArea.deselect();
-//                quoteTextArea.setStyle("-fx-text-fill: #000000");
-//                highlightPause.stop();
-//            }
-            highlightPause.play();
+            else {
+                highlightPause.play();
+            }
         });
         highlightPause.play();
     }
@@ -153,10 +165,7 @@ public class TitleScreenController {
         wpmPause.setOnFinished(event ->{
             wpmLabel.setText(TypingTestHelper.getWPM(userTyped.length())+ " wpm");
             if(userTyped.toString().equals(quoteTextArea.getText())) {
-//                double finalWPM = getWPM();
-//                endOfTest(finalWPM, quote); quote was a parameter
-                stopTest();
-                resultSceneChange();
+
             }
             else {
                 wpmPause.play();
@@ -166,7 +175,7 @@ public class TitleScreenController {
 
     }
 
-    private static void stopTest() {
+    public static void stopTest() {
         if(wpmPause.getStatus() != Animation.Status.STOPPED) {
             wpmPause.stop();
         }
@@ -174,6 +183,7 @@ public class TitleScreenController {
             highlightPause.stop();
         }
         testIsOngoing = false;
+        wpmLabel.setText("0.0 wpm");
         quoteTextArea.deselect();
         quoteTextArea.setStyle("-fx-text-fill: #000000");
         userTyped = new StringBuilder();

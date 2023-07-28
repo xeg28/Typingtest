@@ -2,10 +2,12 @@ package com.typingtest;
 
 import com.controllers.TestResults.TestResultsController;
 import com.controllers.addquote.AddQuoteController;
+import com.controllers.listquotes.ListQuotesController;
 import com.controllers.template.HeaderController;
 import com.controllers.titlescreen.TitleScreenController;
 import com.helpers.WriteAndReadHelper;
 import com.views.addquote.AddQuote;
+import com.views.listquotes.ListQuotes;
 import com.views.testresults.TestResults;
 import com.views.titlescreen.TitleScreen;
 import com.views.template.Header;
@@ -35,6 +37,7 @@ public class Main extends Application  {
         loadHeader(border);
         loadTitleResults();
         loadAddQuote();
+        loadListQuotes();
         WriteAndReadHelper.setQuoteIdSeed();
 
         stage.getIcons().add(icon);
@@ -59,6 +62,12 @@ public class Main extends Application  {
         Header header = new Header();
         border.setTop(Header.getHeader());
         HeaderController.setHandlersForHeader();
+    }
+
+    public void loadListQuotes() {
+        ListQuotes listQuotes = new ListQuotes();
+        ListQuotesController.setHandlersForListQuotes();
+
     }
 
     public void loadTitleResults() {
