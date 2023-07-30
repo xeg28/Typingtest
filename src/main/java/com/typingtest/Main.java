@@ -13,10 +13,6 @@ import com.views.titlescreen.TitleScreen;
 import com.views.template.Header;
 import javafx.application.Application;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
@@ -25,13 +21,15 @@ import javafx.stage.Stage;
 public class Main extends Application  {
     public static Stage primaryStage;
 
+    public static Scene primaryScene;
+
     @Override
     public void start(Stage stage) {
         Image icon = new Image(this.getClass().getResourceAsStream("icon.png"));
-        TitleScreen titleScreen = new TitleScreen();
+        TitleScreen.load();
         TitleScreenController.setHandlersForTitleScreen();
-        BorderPane border = titleScreen.getBorder();
-        Scene scene = titleScreen.getScene();
+        BorderPane border = TitleScreen.getBorder();
+        Scene scene = new Scene(border, 1200, 600);
         scene.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
 
         loadHeader(border);
@@ -47,6 +45,7 @@ public class Main extends Application  {
         stage.show();
 
         primaryStage = stage;
+        primaryScene = scene;
     }
 
     public static void main(String[] args) {
@@ -55,23 +54,23 @@ public class Main extends Application  {
 
     public void loadAddQuote() {
 
-        AddQuote addQuote = new AddQuote();
+        AddQuote.load();
         AddQuoteController.setHandlersForAddQuote();
     }
     public void loadHeader(BorderPane border) {
-        Header header = new Header();
+        Header.load();
         border.setTop(Header.getHeader());
         HeaderController.setHandlersForHeader();
     }
 
     public void loadListQuotes() {
-        ListQuotes listQuotes = new ListQuotes();
+        ListQuotes.load();
         ListQuotesController.setHandlersForListQuotes();
 
     }
 
     public void loadTitleResults() {
-        TestResults results = new TestResults();
+        TestResults.load();
         TestResultsController.setHandlersForTestResults();
     }
 }

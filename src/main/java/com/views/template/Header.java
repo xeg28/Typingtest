@@ -19,7 +19,7 @@ public class Header {
     public static Button createUser = new Button("Create User");
     public static Button loadUser = new Button("Load User");
 
-    public Header() {
+    public static void load() {
         header.setPadding(new Insets(15, 40, 15, 40));
         header.setSpacing(50);
         header.setStyle("-fx-background-color: #336699;");
@@ -45,7 +45,6 @@ public class Header {
         innerRight.setPrefWidth(400);
         innerRight.getChildren().addAll(newQuote, createUser, loadUser);
     }
-
     private static void setLabels() {
         usernameLabel.setText("Default User");
         usernameLabel.setFont(Font.font("Helvatica", FontWeight.BOLD, 25));

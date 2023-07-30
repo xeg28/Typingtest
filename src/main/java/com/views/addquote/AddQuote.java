@@ -1,24 +1,20 @@
 package com.views.addquote;
 
-import com.controllers.listquotes.ListQuotesController;
-import com.views.listquotes.ListQuotes;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
+import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
-import java.util.List;
-
 public class AddQuote {
-    private static Scene scene;
-    private static Scene lastScene;
+    private static BorderPane lastRoot;
     public static BorderPane border;
     private static VBox body = new VBox();
     public static TextArea quoteTitle = new TextArea();
@@ -27,10 +23,9 @@ public class AddQuote {
     public static Button backButton = new Button("Back");
     public static Button addQuoteBtn = new Button("Create Quote");
 
-    public AddQuote() {
+    public static void load() {
         border = new BorderPane();
         border.setCenter(body);
-        scene = new Scene(border, 1200,600);
 
         body.setPadding(new Insets(30,30,30,30));
         body.setSpacing(20);
@@ -62,17 +57,17 @@ public class AddQuote {
         });
     }
 
-    public static void setLastScene(Scene prevScene) {
-        if(prevScene != scene)
-            lastScene = prevScene;
+    public static void setLastRoot(BorderPane prevRoot) {
+        if(prevRoot != border)
+            lastRoot = prevRoot;
     }
 
-    public static Scene getLastScene() {
-        return lastScene;
+    public static BorderPane getLastRoot() {
+        return lastRoot;
     }
 
-    public static Scene getScene() {
-        return scene;
+    public static BorderPane getBorder() {
+        return border;
     }
 
 }

@@ -1,21 +1,15 @@
 package com.controllers.addquote;
 
-import com.controllers.template.HeaderController;
-import com.controllers.titlescreen.TitleScreenController;
 import com.helpers.QuoteHelper;
 import com.helpers.WriteAndReadHelper;
 import com.models.Quote;
 import com.typingtest.Main;
 import com.views.addquote.AddQuote;
-import com.views.listquotes.ListQuotes;
 import com.views.template.Header;
-import com.views.testresults.TestResults;
 import com.views.titlescreen.TitleScreen;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.Scene;
-
-import java.util.List;
+import javafx.scene.layout.BorderPane;
 
 public class AddQuoteController {
 
@@ -24,20 +18,10 @@ public class AddQuoteController {
             @Override
             public void handle(ActionEvent actionEvent) {
                 // We access this page from the header so we look there for the previous page
-                // TODO: instead of getting the lastscene you get an instance of the class
-                Scene lastScene = AddQuote.getLastScene();
-                if(lastScene == TitleScreen.getScene()) {
-                    TitleScreen.getBorder().setTop(Header.getHeader());
-                    Main.primaryStage.setScene(TitleScreen.getScene());
-                }
-                else if(lastScene == TestResults.getScene()) {
-                    TestResults.border.setTop(Header.getHeader());
-                    Main.primaryStage.setScene(TestResults.getScene());
-                }
-                else if(lastScene == ListQuotes.getScene()) {
-                    ListQuotes.getBorder().setTop(Header.getHeader());
-                    Main.primaryStage.setScene(ListQuotes.getScene());
-                }
+                BorderPane lastRoot = AddQuote.getLastRoot();
+
+                lastRoot.setTop(Header.getHeader());
+                Main.primaryScene.setRoot(lastRoot);
             }
         });
 
@@ -54,7 +38,9 @@ public class AddQuoteController {
                     QuoteHelper.updateQuotes();
 
                     TitleScreen.getBorder().setTop(Header.getHeader());
-                    Main.primaryStage.setScene(TitleScreen.getScene());
+                    Main.primaryScene.setRoot(TitleScreen.getBorder());
+                    AddQuote.quoteTitle.clear();
+                    AddQuote.quote.clear();
                 }
             }
         });

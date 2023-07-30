@@ -74,9 +74,9 @@ public class TitleScreenController {
                     stopTest();
                 }
                 QuoteHelper.addQuotesToList();
-                ListQuotes.setLastScene(Main.primaryStage.getScene());
+                ListQuotes.setLastRoot(TitleScreen.getBorder());
                 ListQuotes.getBorder().setTop(Header.getHeader());
-                Main.primaryStage.setScene(ListQuotes.getScene());
+                Main.primaryScene.setRoot(ListQuotes.getBorder());
             }
         });
     }
@@ -164,10 +164,7 @@ public class TitleScreenController {
     private static void updateWPM() {
         wpmPause.setOnFinished(event ->{
             wpmLabel.setText(TypingTestHelper.getWPM(userTyped.length())+ " wpm");
-            if(userTyped.toString().equals(quoteTextArea.getText())) {
-
-            }
-            else {
+            if(!userTyped.toString().equals(quoteTextArea.getText())) {
                 wpmPause.play();
             }
         });
@@ -185,14 +182,14 @@ public class TitleScreenController {
         testIsOngoing = false;
         wpmLabel.setText("0.0 wpm");
         quoteTextArea.deselect();
-        quoteTextArea.setStyle("-fx-text-fill: #000000");
         userTyped = new StringBuilder();
     }
 
     private static void resultSceneChange() {
         TestResults.border.setTop(Header.getHeader());
         TestResults.userResults.setText("You typed " + wpmLabel.getText());
-        Main.primaryStage.setScene(TestResults.getScene());
+        Main.primaryScene.setRoot(TestResults.getBorder());
+        TestResults.setHeightForTextArea(quoteTextArea.getHeight());
     }
 
 

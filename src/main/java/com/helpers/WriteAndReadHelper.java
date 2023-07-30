@@ -45,4 +45,15 @@ public class WriteAndReadHelper {
         }
 
     }
+
+    public static void deleteQuote(int index) {
+        List<Quote> quotes = QuoteHelper.getQuotes();
+        quotes.remove(index);
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            objectMapper.writeValue(quotesFile, quotes);
+        } catch(IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

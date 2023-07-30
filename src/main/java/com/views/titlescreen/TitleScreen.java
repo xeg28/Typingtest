@@ -3,6 +3,7 @@ package com.views.titlescreen;
 import com.helpers.QuoteHelper;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -15,7 +16,6 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
 public class TitleScreen {
-    private static Scene scene;
     private static BorderPane border;
     private static VBox body = new VBox();
     private static VBox top = new VBox();
@@ -28,11 +28,10 @@ public class TitleScreen {
     public static TextField testQuote = new TextField();
     public static Button testQuoteBtn = new Button("Test Quote");
 
-    public TitleScreen() {
+    public static void load() {
         border = new BorderPane();
         border.setCenter(body);
 
-        scene = new Scene(border, 1200, 600);
 
         body.setPadding(new Insets(30.0, 30.0, 30.0, 30.0));
         body.setSpacing(20);
@@ -62,7 +61,6 @@ public class TitleScreen {
         setAddQuoteTextField();
         bottom.getChildren().add(testQuoteBtn);
     }
-
 
     private static void setQuoteTextArea() {
         quoteTextArea.setText("The quick brown fox jumped over the lazy dog.");
@@ -96,11 +94,6 @@ public class TitleScreen {
         testQuote.setPromptText("Enter a quote.");
         testQuote.setPrefWidth(900);
         bottom.getChildren().add(testQuote);
-    }
-
-
-    public static Scene getScene() {
-        return scene;
     }
 
     public static BorderPane getBorder() {

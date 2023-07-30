@@ -2,7 +2,6 @@ package com.views.testresults;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
@@ -13,7 +12,6 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
 public class TestResults {
-    private static Scene scene;
     public static BorderPane border;
     private static VBox body = new VBox();
     private static HBox resultsContainer = new HBox();
@@ -29,11 +27,10 @@ public class TestResults {
     public static TextArea leaderboard = new TextArea();
 
 
-    public TestResults() {
+    public static void load() {
         border = new BorderPane();
         border.setCenter(body);
 
-        scene = new Scene(border, 1200, 600);
 
         body.setSpacing(20);
         body.setPadding(new Insets(30.0, 30.0, 30.0, 30.0));
@@ -45,7 +42,6 @@ public class TestResults {
         buttonContainer.setSpacing(15);
         buttonContainer.setAlignment(Pos.CENTER);
         buttonContainer.getChildren().addAll(restartButton, nextTestButton, selectQuoteButton);
-
     }
 
     private static void setupResultsContainer() {
@@ -70,11 +66,10 @@ public class TestResults {
 
         userResults.setEditable(false);
         userResults.setFont(Font.font("Helvatica", FontWeight.BOLD, 16.0));
-        userResults.setPrefHeight(340);
 
         leaderboard.setEditable(false);
         leaderboard.setFont(Font.font("Helvatica", FontWeight.BOLD, 16.0));
-        leaderboard.setPrefHeight(340);
+        leaderboard.setPrefHeight(body.getHeight() * .75 - 60);
 
         body.heightProperty().addListener((observable, oldHeight, newHeight) -> {
             if(userResults.getHeight() != 0.0) {
@@ -84,15 +79,18 @@ public class TestResults {
             if(leaderboard.getHeight() != 0.0) {
                 double height = Math.floor(newHeight.doubleValue() * .75 -60);
                 leaderboard.setPrefHeight(height);
-                System.out.println(height);
             }
         });
     }
 
-
-    public static VBox getBody() {
-       return body;
+    public static void setHeightForTextArea(double height) {
+        userResults.setPrefHeight(height - 60);
+        leaderboard.setPrefHeight(height - 60);
     }
 
-    public static Scene getScene() { return scene; }
+    public static BorderPane getBorder() {
+        return border;
+    }
+
+
 }

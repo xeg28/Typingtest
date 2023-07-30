@@ -5,9 +5,9 @@ import com.typingtest.Main;
 import com.views.addquote.AddQuote;
 import com.views.template.Header;
 import javafx.event.ActionEvent;
-import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
+import javafx.scene.layout.BorderPane;
 
 public class HeaderController {
     public static void setHandlersForHeader() {
@@ -15,15 +15,11 @@ public class HeaderController {
             @Override
             public void handle(ActionEvent actionEvent) {
                 TitleScreenController.stopTest();
-                Scene prevScene = Main.primaryStage.getScene();
-                Scene targetScene = AddQuote.getScene();
-                double targetWidth = prevScene.getWidth();
-                double targetHeight = prevScene.getHeight();
+                BorderPane prevRoot = (BorderPane)Main.primaryScene.getRoot();
 
-
-                AddQuote.setLastScene(prevScene);
+                AddQuote.setLastRoot(prevRoot);
                 AddQuote.border.setTop(Header.getHeader());
-                Main.primaryStage.setScene(targetScene);
+                Main.primaryScene.setRoot(AddQuote.getBorder());
             }
         });
     }

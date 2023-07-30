@@ -33,6 +33,10 @@ public class QuoteHelper {
         return quotes.get(index);
     }
 
+    public static List<Quote> getQuotes() {
+        return quotes;
+    }
+
     public static int getQuotesSize() {
         return quotes.size();
     }

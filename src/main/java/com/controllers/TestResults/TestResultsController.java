@@ -9,8 +9,6 @@ import com.views.titlescreen.TitleScreen;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 
-import java.util.List;
-
 public class TestResultsController {
     public static void setHandlersForTestResults() {
         setHandlerForRestartButton();
@@ -23,8 +21,7 @@ public class TestResultsController {
             @Override
             public void handle(ActionEvent actionEvent) {
                 TitleScreen.getBorder().setTop(Header.getHeader());
-                TitleScreen.wpmLabel.setText("0.0 wpm");
-                Main.primaryStage.setScene(TitleScreen.getScene());
+                Main.primaryScene.setRoot(TitleScreen.getBorder());
             }
         });
     }
@@ -34,9 +31,8 @@ public class TestResultsController {
             @Override
             public void handle(ActionEvent actionEvent) {
                 TitleScreen.getBorder().setTop(Header.getHeader());
-                TitleScreen.wpmLabel.setText("0.0 wpm");
                 QuoteHelper.setRandomQuote();
-                Main.primaryStage.setScene(TitleScreen.getScene());
+                Main.primaryScene.setRoot(TitleScreen.getBorder());
             }
         });
     }
@@ -46,9 +42,10 @@ public class TestResultsController {
             @Override
             public void handle(ActionEvent actionEvent) {
                 QuoteHelper.addQuotesToList();
-                ListQuotes.setLastScene(Main.primaryStage.getScene());
+
+                ListQuotes.setLastRoot(TestResults.getBorder());
                 ListQuotes.getBorder().setTop(Header.getHeader());
-                Main.primaryStage.setScene(ListQuotes.getScene());
+                Main.primaryScene.setRoot(ListQuotes.getBorder());
             }
         });
     }
