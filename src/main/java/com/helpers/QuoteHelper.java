@@ -1,14 +1,16 @@
 package com.helpers;
 
 import com.models.Quote;
-import com.views.listquotes.ListQuotes;
-import com.views.titlescreen.TitleScreen;
+import com.views.ListQuotes;
+import com.views.TitleScreen;
 import javafx.scene.control.ListView;
 
 import java.util.List;
 
 public class QuoteHelper {
     private static List<Quote> quotes = WriteAndReadHelper.readQuotes();
+
+    public static Quote currentQuote;
 
     public static void updateQuotes() {
         quotes = WriteAndReadHelper.readQuotes();
@@ -18,6 +20,7 @@ public class QuoteHelper {
         if(!quotes.isEmpty()) {
             Quote randQuote = quotes.get((int)(Math.random() * quotes.size()));
             TitleScreen.quoteTextArea.setText(randQuote.getQuote());
+            currentQuote = randQuote;
         }
     }
 

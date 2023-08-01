@@ -1,12 +1,37 @@
 package com.helpers;
 
+import com.views.TestResults;
 import javafx.scene.control.TextArea;
 
 import java.text.DecimalFormat;
+import java.util.List;
 
 public class TypingTestHelper {
     private static long startTime;
 
+
+    public static void setTextInResultTextArea(double wpm) {
+        StringBuilder text = new StringBuilder();
+        text.append("You typed " + wpm + " wpm\n\n");
+
+        if(UserHelper.currentUser == null) {
+            text.append("Top 5 not available");
+        }
+
+        else if(QuoteHelper.currentQuote != null) {
+            List<Double> topFive = UserHelper.currentUser.getTopFive().get(QuoteHelper.currentQuote.getId());
+            text.append("Your Top 5 for \""+QuoteHelper.currentQuote.getTitle()+"\"\n");
+            for(int i = 0; i < topFive.size(); i++) {
+                text.append((i+1) + ". " + topFive.get(i) + " wpm\n");
+            }
+        }
+        else {
+            text.append("Your Top 5 is not available for test quotes");
+        }
+
+
+        TestResults.userResults.setText(text.toString());
+    }
 
     public static void highlightText(StringBuilder userTyped, TextArea quoteTextArea) {
         String quote = quoteTextArea.getText();
