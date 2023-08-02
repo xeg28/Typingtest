@@ -1,6 +1,7 @@
 package com.controllers;
 
 import com.helpers.QuoteHelper;
+import com.helpers.UserHelper;
 import com.helpers.WriteAndReadHelper;
 import com.models.Quote;
 import com.typingtest.Main;
@@ -52,10 +53,16 @@ public class ListQuotesController {
             @Override
             public void handle(ActionEvent actionEvent) {
                 int itemIndex = ListQuotes.getQuoteList().getSelectionModel().getSelectedIndex();
+                Quote quote = QuoteHelper.getQuote(itemIndex);
+
                 WriteAndReadHelper.deleteQuote(itemIndex);
+                UserHelper.deleteTopFiveForQuote(quote.getId());
                 ListQuotes.getQuoteList().getSelectionModel().clearSelection();
                 QuoteHelper.addQuotesToList();
 
+                if(QuoteHelper.currentQuote == quote) {
+                    QuoteHelper.setRandomQuote();
+                }
             }
         });
     }

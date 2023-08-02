@@ -1,5 +1,8 @@
 package com.helpers;
 
+import com.models.LeaderboardPair;
+import com.models.Quote;
+import com.models.User;
 import com.views.TestResults;
 import javafx.scene.control.TextArea;
 
@@ -20,7 +23,7 @@ public class TypingTestHelper {
 
         else if(QuoteHelper.currentQuote != null) {
             List<Double> topFive = UserHelper.currentUser.getTopFive().get(QuoteHelper.currentQuote.getId());
-            text.append("Your Top 5 for \""+QuoteHelper.currentQuote.getTitle()+"\"\n");
+            text.append("Your Top 5 for \'"+QuoteHelper.currentQuote.getTitle()+"\'\n");
             for(int i = 0; i < topFive.size(); i++) {
                 text.append((i+1) + ". " + topFive.get(i) + " wpm\n");
             }
@@ -29,8 +32,33 @@ public class TypingTestHelper {
             text.append("Your Top 5 is not available for test quotes");
         }
 
-
         TestResults.userResults.setText(text.toString());
+    }
+
+    public static void setTextInLeaderboardsTextArea() {
+        StringBuilder text = new StringBuilder();
+        Quote currQuote = QuoteHelper.currentQuote;
+        if(QuoteHelper.currentQuote != null) {
+            List<LeaderboardPair> topFive = currQuote.getTopFiveTests();
+            text.append("Leaderboards for \'" + currQuote.getTitle() + "\'\n");
+            if(topFive == null || topFive.isEmpty()) {
+                text.append("No tests found.");
+            }
+            else {
+                for(int i = 0; i < 5; i++) {
+                    if(i >= topFive.size()) break;
+
+                    User user = UserHelper.getUserById(topFive.get(i).getUserId());
+
+                    double wpm = topFive.get(i).getWpm();
+                    text.append((i+1) + ". " + user.getName() + " at " + wpm + " wpm\n");
+                }
+            }
+        }
+        else {
+            text.append("Leaderboards not available for test quotes");
+        }
+        TestResults.leaderboard.setText(text.toString());
     }
 
     public static void highlightText(StringBuilder userTyped, TextArea quoteTextArea) {

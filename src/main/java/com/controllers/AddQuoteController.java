@@ -32,6 +32,7 @@ public class AddQuoteController {
                 String quoteText = AddQuote.quote.getText();
 
                 if(!title.isEmpty() && !quoteText.isEmpty()) {
+                    quoteText = quoteText.trim();
                     Quote quote = new Quote(title, quoteText);
                     System.out.println("Id seed: " + quote.getIdSeed());
                     WriteAndReadHelper.writeQuote(quote);

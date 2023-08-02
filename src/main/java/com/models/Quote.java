@@ -1,11 +1,12 @@
 package com.models;
 
 import java.io.Serializable;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 
+import javafx.util.Pair;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.helpers.WriteAndReadHelper;
+
 
 public class Quote implements Serializable
 {
@@ -15,7 +16,7 @@ public class Quote implements Serializable
     private String quote;
     private String title;
 
-    private HashMap<Integer, Double> topFiveTests;
+    private List<LeaderboardPair> topFiveTests = new ArrayList<>();
 
     public Quote() {
         this.id = idSeed++;
@@ -33,10 +34,10 @@ public class Quote implements Serializable
     }
     public void setQuote(String quote) {this.quote = quote; }
 
-    public void addToTopFive(int userId, double wpm) {
-        topFiveTests.put(userId, wpm);
+    public void setTopFiveTests(List<LeaderboardPair> topFiveTests) {
+        this.topFiveTests = topFiveTests;
     }
-    public HashMap<Integer, Double> getTopFiveQuotes() {
+    public List<LeaderboardPair> getTopFiveTests() {
         return topFiveTests;
     }
 

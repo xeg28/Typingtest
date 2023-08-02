@@ -1,8 +1,10 @@
 package com.helpers;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.models.Quote;
 import com.models.User;
+import javafx.util.Pair;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -21,6 +23,7 @@ public class WriteAndReadHelper {
             if(quotesFile.exists() && quotesFile.length() > 1) {
                 int idSeed = Quote.getIdSeed();
                 List<Quote> quotes = objectMapper.readValue(quotesFile, objectMapper.getTypeFactory().constructCollectionType(List.class, Quote.class));
+                //List<Quote> quotes = objectMapper.readValue(quotesFile, new TypeReference<List<Quote>>() {});
                 Quote.setIdSeed(idSeed);
                 return quotes;
             }
@@ -88,6 +91,15 @@ public class WriteAndReadHelper {
         try{
             objectMapper.writeValue(usersFile, users);
         } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void updateQuotes(List<Quote> quotes) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            objectMapper.writeValue(quotesFile, quotes);
+        } catch(IOException e) {
             e.printStackTrace();
         }
     }

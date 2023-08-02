@@ -3,7 +3,6 @@ package com.controllers;
 import com.helpers.QuoteHelper;
 import com.helpers.TypingTestHelper;
 import com.helpers.UserHelper;
-import com.models.User;
 import com.typingtest.Main;
 import com.views.ListQuotes;
 import com.views.Header;
@@ -192,10 +191,12 @@ public class TitleScreenController {
     private static void resultSceneChange(double wpm) {
         if(UserHelper.currentUser != null && QuoteHelper.currentQuote != null) {
             UserHelper.updateUserStats(wpm);
+            QuoteHelper.updateTopFive(wpm);
         }
 
         TestResults.border.setTop(Header.getHeader());
         TypingTestHelper.setTextInResultTextArea(wpm);
+        TypingTestHelper.setTextInLeaderboardsTextArea();
         Main.primaryScene.setRoot(TestResults.getBorder());
         TestResults.setHeightForTextArea(quoteTextArea.getHeight());
     }

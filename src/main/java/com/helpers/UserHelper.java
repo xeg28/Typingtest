@@ -32,6 +32,37 @@ public class UserHelper {
         return users.get(index);
     }
 
+    public static void deleteUser(User user) {
+        users.remove(user);
+        if(currentUser == user) setDefaultUser();
+
+        QuoteHelper.deleteUserInLeaderboards(user.getId());
+        WriteAndReadHelper.updateUsers(users);
+    }
+
+    private static void setDefaultUser() {
+        currentUser = null;
+        Header.usernameLabel.setText("Default User");
+        Header.highWPM.setText("Highest WPM: 0.0");
+        Header.avgWPMLabel.setText("Average WPM: 0.0");
+    }
+
+    public static void deleteTopFiveForQuote(int quoteId) {
+        for(User user : users) {
+            user.getTopFive().remove(quoteId);
+        }
+        WriteAndReadHelper.updateUsers(users);
+    }
+
+    public static User getUserById(int id) {
+        for(User user : users) {
+            if(user.getId() == id) {
+                return user;
+            }
+        }
+        return null;
+    }
+
     public static void updateUserStats(double wpm) {
         currentUser.setTests(currentUser.getTests() + 1);
         currentUser.setTotalSumWPM(currentUser.getTotalSumWPM() + wpm);
@@ -50,6 +81,7 @@ public class UserHelper {
 
 
     }
+
 
     private static void setTopFiveForCurrentQuote(double wpm) {
         int currQuoteId = QuoteHelper.currentQuote.getId();
