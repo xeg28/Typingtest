@@ -54,11 +54,12 @@ public class QuoteHelper {
         if(!quotes.isEmpty()) {
             Quote randQuote = quotes.get((int)(Math.random() * quotes.size()));
             TitleScreen.quoteTextArea.setText(randQuote.getQuote());
+            TypingTestHelper.setScrollPoints(TitleScreen.quoteTextArea);
             currentQuote = randQuote;
         }
         else {
             currentQuote = null;
-            TitleScreen.quoteTextArea.setText("There are no more quotes avaiable, click on the create quote button to add quotes.");
+            TitleScreen.quoteTextArea.setText("There are no quotes available, click on the create quote button to add quotes.");
         }
     }
 

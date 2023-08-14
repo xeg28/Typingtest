@@ -5,12 +5,18 @@ import com.models.Quote;
 import com.models.User;
 import com.views.TestResults;
 import javafx.scene.control.TextArea;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 public class TypingTestHelper {
     private static long startTime;
+
+    public static List<Integer> scrollPoints = new ArrayList<>();
 
 
     public static void setTextInResultTextArea(double wpm) {
@@ -61,11 +67,45 @@ public class TypingTestHelper {
         TestResults.leaderboard.setText(text.toString());
     }
 
+    public static void setScrollPoints(TextArea textArea) {
+        scrollPoints = new ArrayList<>();
+        double width = (textArea.getWidth() == 0.0) ? textArea.getPrefWidth() :  textArea.getWidth();
+
+        String text = textArea.getText();
+        String[] words = text.split(" ");
+        Font font = textArea.getFont();
+        int sum = 0;
+        StringBuilder currentLine = new StringBuilder();
+        for(int i = 0; i < words.length; i++) {
+            StringBuilder potentialLine = new StringBuilder(currentLine);
+            if (!currentLine.toString().isEmpty()) {
+                potentialLine.append(" ");
+            }
+            potentialLine.append(words[i]);
+
+            Text temp = new Text(potentialLine.toString());
+            temp.setFont(Font.font("Helvatica", FontWeight.BOLD, 21.0));
+
+            if(temp.getBoundsInLocal().getWidth() <= width) {
+                currentLine = potentialLine;
+            } else {
+                sum += currentLine.length() - 1;
+                scrollPoints.add(sum);
+                currentLine = new StringBuilder(words[i]);
+            }
+        }
+    }
+
+
     public static void highlightText(StringBuilder userTyped, TextArea quoteTextArea) {
         String quote = quoteTextArea.getText();
         String testQuote = "";
 
         for(int i = 0; i < userTyped.length(); i++) {
+            if(scrollPoints.contains(i)) {
+                scrollPoints.remove(scrollPoints.indexOf(i));
+                quoteTextArea.setScrollTop(quoteTextArea.getScrollTop() + 30);
+            }
             if(userTyped.length() < quote.length()) {
                 testQuote += quote.charAt(i);
             }
@@ -93,7 +133,7 @@ public class TypingTestHelper {
         }
     }
 
-    private static int numOfChars(StringBuilder userTyped, TextArea quoteTextArea) {
+    public static int numOfChars(StringBuilder userTyped, TextArea quoteTextArea) {
         int numOfChars = 0;
         String quote = quoteTextArea.getText();
         for(int i = 0; i < userTyped.length(); i++) {

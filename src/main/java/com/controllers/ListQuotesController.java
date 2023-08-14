@@ -1,6 +1,7 @@
 package com.controllers;
 
 import com.helpers.QuoteHelper;
+import com.helpers.TypingTestHelper;
 import com.helpers.UserHelper;
 import com.helpers.WriteAndReadHelper;
 import com.models.Quote;
@@ -40,6 +41,7 @@ public class ListQuotesController {
                     Quote quoteSelected = QuoteHelper.getQuote(itemIndex);
                     QuoteHelper.currentQuote = quoteSelected;
                     TitleScreen.quoteTextArea.setText(quoteSelected.getQuote());
+                    TypingTestHelper.setScrollPoints(TitleScreen.quoteTextArea);
 
                     TitleScreen.getBorder().setTop(Header.getHeader());
                     Main.primaryScene.setRoot(TitleScreen.getBorder());
@@ -53,15 +55,18 @@ public class ListQuotesController {
             @Override
             public void handle(ActionEvent actionEvent) {
                 int itemIndex = ListQuotes.getQuoteList().getSelectionModel().getSelectedIndex();
-                Quote quote = QuoteHelper.getQuote(itemIndex);
 
-                WriteAndReadHelper.deleteQuote(itemIndex);
-                UserHelper.deleteTopFiveForQuote(quote.getId());
-                ListQuotes.getQuoteList().getSelectionModel().clearSelection();
-                QuoteHelper.addQuotesToList();
+                if(itemIndex >= 0 && itemIndex < QuoteHelper.getQuotesSize()) {
+                    Quote quote = QuoteHelper.getQuote(itemIndex);
 
-                if(QuoteHelper.currentQuote == quote) {
-                    QuoteHelper.setRandomQuote();
+                    WriteAndReadHelper.deleteQuote(itemIndex);
+                    UserHelper.deleteTopFiveForQuote(quote.getId());
+                    ListQuotes.getQuoteList().getSelectionModel().clearSelection();
+                    QuoteHelper.addQuotesToList();
+
+                    if (QuoteHelper.currentQuote == quote) {
+                        QuoteHelper.setRandomQuote();
+                    }
                 }
             }
         });

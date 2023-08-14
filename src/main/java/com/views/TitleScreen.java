@@ -1,6 +1,7 @@
 package com.views;
 
 import com.helpers.QuoteHelper;
+import com.helpers.TypingTestHelper;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -19,12 +20,15 @@ public class TitleScreen {
     private static VBox top = new VBox();
     private static HBox innerTop = new HBox();
     private static VBox bottom = new VBox();
+    private static VBox shortcuts = new VBox();
 
     public static TextArea quoteTextArea = new TextArea();
     public static Label wpmLabel = new Label("0.0 wpm");
     public static Button quoteListBtn = new Button("Select Quote");
     public static TextField testQuote = new TextField();
     public static Button testQuoteBtn = new Button("Test Quote");
+
+    public static Button shortcutsBtn = new Button("Show Shortcuts");
 
     public static void load() {
         border = new BorderPane();
@@ -40,11 +44,15 @@ public class TitleScreen {
         setQuoteTextArea();
         setWPMLabel();
 
+        HBox btnContainer = new HBox();
+        btnContainer.setSpacing(15);
+        btnContainer.getChildren().addAll(quoteListBtn, shortcutsBtn);
+        setShortcutLabels();
 
-        top.getChildren().add(innerTop);
+        top.getChildren().addAll(innerTop, btnContainer);
         top.setSpacing(10);
         top.setPrefHeight(412);
-        top.getChildren().add(quoteListBtn);
+
         body.heightProperty().addListener((observable, oldHeight, newHeight) -> {
             if(top.getHeight() != 0.0) {
                 double topHeight = newHeight.doubleValue() - 60 - bottom.getHeight();
@@ -53,6 +61,7 @@ public class TitleScreen {
                 quoteTextArea.setPrefHeight(quoteTextAreaHeight);
             }
         });
+
 
         bottom.setAlignment(Pos.CENTER_LEFT);
         bottom.setSpacing(10);
@@ -72,6 +81,7 @@ public class TitleScreen {
             if(quoteTextArea.getWidth() != 0.0) {
                 double desiredWidth = newWidth.doubleValue() - 60 - wpmLabel.getWidth();
                 quoteTextArea.setPrefWidth(desiredWidth);
+                TypingTestHelper.setScrollPoints(quoteTextArea);
             }
 
         });
@@ -79,6 +89,18 @@ public class TitleScreen {
         QuoteHelper.setRandomQuote();
     }
 
+
+    private static void setShortcutLabels() {
+        Label nextTest = new Label("Next Test: CTR+ALT+K");
+        nextTest.setFont(Font.font("Helvatica", FontWeight.BOLD, 20));
+        Label restartTest = new Label("Restart Test: CTR+ALT+L");
+        restartTest.setFont(Font.font("Helvatica", FontWeight.BOLD, 20));
+
+        shortcuts.setPadding(new Insets(0,30,10,30));
+        shortcuts.setSpacing(15);
+        shortcuts.setAlignment(Pos.CENTER_LEFT);
+        shortcuts.getChildren().addAll(nextTest, restartTest);
+    }
 
     private static void setWPMLabel () {
         wpmLabel.setAlignment(Pos.CENTER);
@@ -92,6 +114,14 @@ public class TitleScreen {
         testQuote.setPromptText("Enter a quote.");
         testQuote.setPrefWidth(900);
         bottom.getChildren().add(testQuote);
+    }
+
+    public static void showShortcuts() {
+        border.setBottom(shortcuts);
+    }
+
+    public static void hideShortcuts() {
+        border.getChildren().remove(shortcuts);
     }
 
     public static BorderPane getBorder() {

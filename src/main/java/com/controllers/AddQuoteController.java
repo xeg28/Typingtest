@@ -35,8 +35,19 @@ public class AddQuoteController {
                     quoteText = quoteText.trim();
                     Quote quote = new Quote(title, quoteText);
                     System.out.println("Id seed: " + quote.getIdSeed());
-                    WriteAndReadHelper.writeQuote(quote);
-                    QuoteHelper.updateQuotes();
+
+
+                    if(QuoteHelper.getQuotes().isEmpty()) {
+                        WriteAndReadHelper.writeQuote(quote);
+                        QuoteHelper.updateQuotes();
+                        QuoteHelper.setRandomQuote();
+                    }
+                    else {
+                        WriteAndReadHelper.writeQuote(quote);
+                        QuoteHelper.updateQuotes();
+                    }
+
+
 
                     TitleScreen.getBorder().setTop(Header.getHeader());
                     Main.primaryScene.setRoot(TitleScreen.getBorder());

@@ -39,6 +39,11 @@ public class Main extends Application  {
         stage.setScene(scene);
         stage.show();
 
+        stage.setOnHiding(event -> {
+            CreateUser.getStage().close();
+            LoadUser.getStage().close();
+        });
+
         primaryStage = stage;
         primaryScene = scene;
     }

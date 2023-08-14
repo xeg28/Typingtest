@@ -20,6 +20,7 @@ public class TestResultsController {
         TestResults.restartButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
+                TitleScreen.quoteTextArea.setScrollTop(0);
                 TitleScreen.getBorder().setTop(Header.getHeader());
                 Main.primaryScene.setRoot(TitleScreen.getBorder());
             }

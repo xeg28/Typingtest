@@ -12,10 +12,7 @@ import javafx.animation.Animation;
 import javafx.animation.PauseTransition;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
@@ -41,12 +38,14 @@ public class TitleScreenController {
     private static boolean ctrBksPressed = false;
     private static boolean tabPressed = false;
 
+    private static boolean enterPressed = false;
 
 
     public static void setHandlersForTitleScreen() {
         quoteTextAreaHandler();
         testQuoteHandler();
         quoteListBtnHandler();
+        showShortCutsHandler();
     }
 
     public static void testQuoteHandler() {
@@ -62,6 +61,9 @@ public class TitleScreenController {
                 else {
                     QuoteHelper.currentQuote = null;
                     quoteTextArea.setText(newQuote);
+                    TypingTestHelper.setScrollPoints(quoteTextArea);
+                    System.out.println(TypingTestHelper.scrollPoints);
+                    testQuoteTextField.clear();
                 }
 
             }
@@ -83,9 +85,26 @@ public class TitleScreenController {
         });
     }
 
+    public static void showShortCutsHandler() {
+        Button btn = TitleScreen.shortcutsBtn;
+        btn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                if(btn.getText().equals("Show Shortcuts")) {
+                    TitleScreen.showShortcuts();
+                    btn.setText("Hide Shortcuts");
+                } else {
+                    TitleScreen.hideShortcuts();
+                    btn.setText("Show Shortcuts");
+                }
+            }
+        });
+    }
+
     public static void quoteTextAreaHandler() {
 
-        KeyCombination nextTestCombo = new KeyCodeCombination(KeyCode.BACK_SPACE, KeyCodeCombination.CONTROL_DOWN);
+        KeyCombination nextTestCombo = new KeyCodeCombination( KeyCode.K, KeyCodeCombination.ALT_DOWN, KeyCodeCombination.CONTROL_DOWN);
+        KeyCombination restartTestCombo = new KeyCodeCombination( KeyCode.L, KeyCodeCombination.ALT_DOWN, KeyCodeCombination.CONTROL_DOWN);
 
         quoteTextArea.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             if (event.isControlDown() && event.getCode() == KeyCode.BACK_SPACE) {
@@ -100,7 +119,26 @@ public class TitleScreenController {
                 event.consume();
                 backspacePressed = true;
             }
+            else if(event.getCode() == KeyCode.ENTER) {
+                event.consume();
+                enterPressed = true;
+            }
         });
+
+        quoteTextArea.setOnKeyPressed(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent keyEvent) {
+                if(nextTestCombo.match(keyEvent)) {
+                    stopTest();
+                    QuoteHelper.setRandomQuote();
+                }
+                if(restartTestCombo.match(keyEvent)) {
+                    stopTest();
+                    quoteTextArea.setScrollTop(0.0);
+                }
+            }
+        });
+
 
         quoteTextArea.setOnKeyTyped(new EventHandler<KeyEvent>() {
             @Override
@@ -111,7 +149,15 @@ public class TitleScreenController {
                     TypingTestHelper.startTime();
                     updateWPM();
                 }
-                if(ctrBksPressed) {
+                if(enterPressed) {
+                    userTyped.append((char)10);
+                    enterPressed = false;
+                    quoteTextArea.setScrollTop(quoteTextArea.getScrollTop() + 30);
+//                    double contentHeight = quoteTextArea.lookup(".content").getBoundsInLocal().getHeight();
+//                    double viewportHeight = quoteTextArea.getHeight();
+//                    System.out.println(Math.max(0, contentHeight - viewportHeight) / 30);
+                }
+                else if(ctrBksPressed) {
                     ctrBksPressed = false;
                 }
                 else if(tabPressed) {
@@ -166,7 +212,7 @@ public class TitleScreenController {
 
     private static void updateWPM() {
         wpmPause.setOnFinished(event ->{
-            wpmLabel.setText(TypingTestHelper.getWPM(userTyped.length())+ " wpm");
+            wpmLabel.setText(TypingTestHelper.getWPM(TypingTestHelper.numOfChars(userTyped, quoteTextArea))+ " wpm");
             if(!userTyped.toString().equals(quoteTextArea.getText())) {
                 wpmPause.play();
             }

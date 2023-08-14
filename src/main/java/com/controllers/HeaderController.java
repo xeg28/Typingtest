@@ -1,8 +1,6 @@
 package com.controllers;
 
-import com.controllers.TitleScreenController;
 import com.helpers.UserHelper;
-import com.models.User;
 import com.typingtest.Main;
 import com.views.*;
 import javafx.event.ActionEvent;
@@ -34,7 +32,11 @@ public class HeaderController {
         Header.createUser.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
+                if(!CreateUser.getStage().isFocused()) {
+                    CreateUser.getStage().toFront();
+                }
                 CreateUser.getStage().show();
+                TitleScreenController.stopTest();
             }
         });
     }
@@ -43,8 +45,14 @@ public class HeaderController {
         Header.loadUser.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
+                if(!LoadUser.getStage().isFocused()) {
+                    LoadUser.getStage().toFront();
+                    UserHelper.addUsersToList();
+                }
+
                 UserHelper.addUsersToList();
                 LoadUser.getStage().show();
+                TitleScreenController.stopTest();
             }
         });
     }
