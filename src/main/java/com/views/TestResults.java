@@ -1,5 +1,7 @@
 package com.views;
 
+import com.models.LeaderboardPair;
+import com.typingtest.Main;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -65,11 +67,12 @@ public class TestResults {
         resultsContainer.getChildren().addAll(userResultsVBox, leaderboardVbox);
 
         userResults.setEditable(false);
+        userResults.setWrapText(true);
         userResults.setFont(Font.font("Helvatica", FontWeight.BOLD, 16.0));
 
         leaderboard.setEditable(false);
+        leaderboard.setWrapText(true);
         leaderboard.setFont(Font.font("Helvatica", FontWeight.BOLD, 16.0));
-        leaderboard.setPrefHeight(body.getHeight() * .75 - 60);
 
         body.heightProperty().addListener((observable, oldHeight, newHeight) -> {
             if(userResults.getHeight() != 0.0) {
@@ -83,9 +86,9 @@ public class TestResults {
         });
     }
 
-    public static void setHeightForTextArea(double height) {
-        userResults.setPrefHeight(height - 60);
-        leaderboard.setPrefHeight(height - 60);
+    public static void setHeightForTextArea() {
+        userResults.setPrefHeight(Main.primaryScene.getHeight() * .65 - 60);
+        leaderboard.setPrefHeight(Main.primaryScene.getHeight() * .65 - 60);
     }
 
     public static BorderPane getBorder() {

@@ -21,21 +21,48 @@ public class QuoteHelper {
 
     public static void updateTopFive(double wpm) {
         List<LeaderboardPair> topFive = currentQuote.getTopFiveTests();
-        LeaderboardPair newPair = new LeaderboardPair(UserHelper.currentUser.getId(), wpm);
+        int userId = UserHelper.currentUser.getId();
+        LeaderboardPair newPair = new LeaderboardPair(userId, wpm);
         if(topFive == null) {
             currentQuote.setTopFiveTests(new ArrayList<>());
             topFive = currentQuote.getTopFiveTests();
         }
-        topFive.add(newPair);
+        boolean userInLeaderboards = false;
+        boolean userBeatPR = false;
+        for(int i = 0; i < topFive.size(); i++) {
+            if(topFive.get(i).getUserId() == userId) userInLeaderboards = true;
+        }
 
         int j = topFive.size() - 1;
-        while(j > 0 && wpm > topFive.get(j - 1).getWpm()) {
+        while(j >= 0 && wpm > topFive.get(j).getWpm()) {
+            if(topFive.get(j).getUserId() == userId) {
+                topFive.remove(j);
+                userBeatPR = true;
+            }
+            j--;
+        }
+
+        if(userInLeaderboards && userBeatPR) insertToTopFive(j + 1, newPair);
+        else if(userInLeaderboards) return;
+        else insertToTopFive(j + 1, newPair);
+
+
+        WriteAndReadHelper.updateQuotes(quotes);
+    }
+
+    private static void insertToTopFive(int index, LeaderboardPair pair) {
+        List<LeaderboardPair> topFive = currentQuote.getTopFiveTests();
+        if(topFive.isEmpty()) {
+            topFive.add(pair);
+            return;
+        }
+        topFive.add(pair);
+        int j = topFive.size() - 1;
+        while(j > index) {
             topFive.set(j, topFive.get(j - 1));
             j--;
         }
-        topFive.set(j, newPair);
-
-        WriteAndReadHelper.updateQuotes(quotes);
+        topFive.set(j, pair);
     }
 
     public static void deleteUserInLeaderboards(int userId) {

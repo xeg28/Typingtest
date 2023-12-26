@@ -34,26 +34,33 @@ public class AddQuote {
         Label titlelabel = new Label("Quote Title");
         titlelabel.setFont(Font.font("Helvatica", FontWeight.BOLD, 20));
         quoteTitle.setFont(Font.font("Helvatica", FontWeight.BOLD, 18));
+        quoteTitle.setWrapText(true);
 
         Label quoteTextLabel = new Label("Quote Text");
         quoteTextLabel.setFont(Font.font("Helvatica", FontWeight.BOLD, 20));
         quote.setFont(Font.font("Helvatica", FontWeight.BOLD, 16));
+        quote.setWrapText(true);
 
         HBox buttonContainer = new HBox();
         buttonContainer.setSpacing(15);
         buttonContainer.setAlignment(Pos.CENTER);
         buttonContainer.getChildren().addAll(backButton, addQuoteBtn);
 
-        setHeightProperty(titlelabel, quoteTextLabel);
+        setWidthHeightProperties(titlelabel, quoteTextLabel);
         body.getChildren().addAll(titlelabel, quoteTitle, quoteTextLabel, quote, buttonContainer);
     }
 
-    private static void setHeightProperty(Label titleLabel, Label textLabel) {
+    private static void setWidthHeightProperties(Label titleLabel, Label textLabel) {
         body.heightProperty().addListener((observable, oldHeight, newHeight) -> {
             double quoteTitleHeight = newHeight.doubleValue() * 0.08 - 140 - textLabel.getHeight() - titleLabel.getHeight();
             double quoteTextHeight = newHeight.doubleValue() - quoteTitleHeight - 140 - textLabel.getHeight() - titleLabel.getHeight();
             quoteTitle.setPrefHeight(quoteTitleHeight);
             quote.setPrefHeight(quoteTextHeight);
+        });
+        body.widthProperty().addListener((observable, oldWidth, newWidth) -> {
+            double prefWidth = newWidth.doubleValue() * 0.8;
+            quoteTitle.setMaxWidth(prefWidth);
+            quote.setMaxWidth(prefWidth);
         });
     }
 

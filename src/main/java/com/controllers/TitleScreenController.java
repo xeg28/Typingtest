@@ -244,7 +244,7 @@ public class TitleScreenController {
         TypingTestHelper.setTextInResultTextArea(wpm);
         TypingTestHelper.setTextInLeaderboardsTextArea();
         Main.primaryScene.setRoot(TestResults.getBorder());
-        TestResults.setHeightForTextArea(quoteTextArea.getHeight());
+        TestResults.setHeightForTextArea();
     }
 
 }

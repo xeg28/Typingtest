@@ -11,6 +11,7 @@ import javafx.scene.text.Text;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 public class TypingTestHelper {
@@ -51,13 +52,17 @@ public class TypingTestHelper {
                 text.append("No tests found.");
             }
             else {
-                for(int i = 0; i < 5; i++) {
+                HashSet<Integer> userIds = new HashSet<>();
+                for(int count = 0, i = 0; count < 5; i++) {
                     if(i >= topFive.size()) break;
 
-                    User user = UserHelper.getUserById(topFive.get(i).getUserId());
+                    int userId = topFive.get(i).getUserId();
+                    if(userIds.contains(userId)) continue;
 
+                    User user = UserHelper.getUserById(userId);
+                    userIds.add(userId);
                     double wpm = topFive.get(i).getWpm();
-                    text.append((i+1) + ". " + user.getName() + " at " + wpm + " wpm\n");
+                    text.append((count++ +1) + ". " + user.getName() + " at " + wpm + " wpm\n");
                 }
             }
         }

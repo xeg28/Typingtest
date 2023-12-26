@@ -1,9 +1,6 @@
 package com.controllers;
 
-import com.helpers.QuoteHelper;
-import com.helpers.TypingTestHelper;
-import com.helpers.UserHelper;
-import com.helpers.WriteAndReadHelper;
+import com.helpers.*;
 import com.models.Quote;
 import com.typingtest.Main;
 import com.views.ListQuotes;
@@ -54,10 +51,16 @@ public class ListQuotesController {
         ListQuotes.deleteQuoteBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
+
+
                 int itemIndex = ListQuotes.getQuoteList().getSelectionModel().getSelectedIndex();
 
                 if(itemIndex >= 0 && itemIndex < QuoteHelper.getQuotesSize()) {
                     Quote quote = QuoteHelper.getQuote(itemIndex);
+                    boolean userConfirmation = AlertHelper.createAlertConformation("Delete Quote Warning",
+                            "Are you sure you want to delete '" + quote.getTitle() + "'?");
+                    if(!userConfirmation) return;
+
 
                     WriteAndReadHelper.deleteQuote(itemIndex);
                     UserHelper.deleteTopFiveForQuote(quote.getId());

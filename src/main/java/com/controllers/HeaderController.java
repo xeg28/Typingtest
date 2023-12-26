@@ -5,6 +5,7 @@ import com.typingtest.Main;
 import com.views.*;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.scene.input.DragEvent;
 import javafx.scene.layout.BorderPane;
 
 public class HeaderController {
@@ -56,5 +57,4 @@ public class HeaderController {
             }
         });
     }
-
 }
