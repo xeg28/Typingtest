@@ -24,15 +24,6 @@ public class Main extends Application  {
         Scene scene = new Scene(border, 1200, 600);
         scene.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
 
-        loadHeader(border);
-        loadTitleResults();
-        loadAddQuote();
-        loadListQuotes();
-        loadCreateUser();
-        loadLoadUser();
-        setIdSeeds();
-
-
         stage.getIcons().add(icon);
         stage.setTitle("Typing Test");
         stage.centerOnScreen();
@@ -46,6 +37,14 @@ public class Main extends Application  {
 
         primaryStage = stage;
         primaryScene = scene;
+
+        loadHeader(border);
+        loadTitleResults();
+        loadAddQuote();
+        loadListQuotes();
+        loadCreateUser();
+        loadLoadUser();
+        setIdSeeds();
     }
 
     public static void main(String[] args) {

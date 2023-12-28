@@ -1,13 +1,16 @@
 package com.helpers;
 
 import com.models.LeaderboardPair;
+import com.models.LeaderboardRow;
 import com.models.Quote;
 import com.models.User;
 import com.views.TestResults;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
+import javafx.util.Pair;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -21,35 +24,33 @@ public class TypingTestHelper {
 
 
     public static void setTextInResultTextArea(double wpm) {
-        StringBuilder text = new StringBuilder();
-        text.append("You typed " + wpm + " wpm\n\n");
-
         if(UserHelper.currentUser == null) {
-            text.append("Top 5 not available");
+            TestResults.userTopFiveLabel.setText("Your top 5 is not available");
+            TestResults.wpmLabel.setText("You typed " + wpm + " wpm");
+            return;
         }
 
-        else if(QuoteHelper.currentQuote != null) {
+        TableView<Pair<Integer, Double>> topFiveTable = TestResults.userResults;
+        if(!topFiveTable.getItems().isEmpty()) topFiveTable.getItems().clear();
+        if(QuoteHelper.currentQuote != null) {
             List<Double> topFive = UserHelper.currentUser.getTopFive().get(QuoteHelper.currentQuote.getId());
-            text.append("Your Top 5 for \'"+QuoteHelper.currentQuote.getTitle()+"\'\n");
             for(int i = 0; i < topFive.size(); i++) {
-                text.append((i+1) + ". " + topFive.get(i) + " wpm\n");
+                topFiveTable.getItems().add(new Pair<>(i+1, topFive.get(i)));
             }
         }
-        else {
-            text.append("Your Top 5 is not available for test quotes");
-        }
-
-        TestResults.userResults.setText(text.toString());
+        TestResults.wpmLabel.setText("You typed " + wpm + " wpm");
+        TestResults.userTopFiveLabel.setText("Top 5 for '" + UserHelper.currentUser.getName() +"'");
     }
 
     public static void setTextInLeaderboardsTextArea() {
-        StringBuilder text = new StringBuilder();
         Quote currQuote = QuoteHelper.currentQuote;
+        TableView<LeaderboardRow> leaderTable = TestResults.leaderboard;
+        if(!leaderTable.getItems().isEmpty()) leaderTable.getItems().clear();
         if(QuoteHelper.currentQuote != null) {
             List<LeaderboardPair> topFive = currQuote.getTopFiveTests();
-            text.append("Leaderboards for \'" + currQuote.getTitle() + "\'\n");
+
             if(topFive == null || topFive.isEmpty()) {
-                text.append("No tests found.");
+                TestResults.leaderboardLabel.setText("Leaderboards not available");
             }
             else {
                 HashSet<Integer> userIds = new HashSet<>();
@@ -62,14 +63,16 @@ public class TypingTestHelper {
                     User user = UserHelper.getUserById(userId);
                     userIds.add(userId);
                     double wpm = topFive.get(i).getWpm();
-                    text.append((count++ +1) + ". " + user.getName() + " at " + wpm + " wpm\n");
+                    leaderTable.getItems().add(new LeaderboardRow(count++ + 1, user.getName(), wpm));
+                    TestResults.leaderboardLabel.setText("Leaderbord for '" + currQuote.getTitle() + "'");
+
                 }
             }
         }
         else {
-            text.append("Leaderboards not available for test quotes");
+            TestResults.leaderboardLabel.setText("Leaderboards not available");
         }
-        TestResults.leaderboard.setText(text.toString());
+
     }
 
     public static void setScrollPoints(TextArea textArea) {

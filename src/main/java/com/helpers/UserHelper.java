@@ -77,7 +77,8 @@ public class UserHelper {
 
         Header.highWPM.setText("Highest WPM: " + currentUser.getBestWPM());
         Header.avgWPMLabel.setText("Average WPM: " + currentUser.getAverageWPM());
-
+        Header.userTooltip.setText("Highest WPM: " + currentUser.getBestWPM() +
+                "\nAverage WPM: " + currentUser.getAverageWPM());
 
     }
 

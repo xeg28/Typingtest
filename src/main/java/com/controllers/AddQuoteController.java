@@ -11,8 +11,6 @@ import com.views.TitleScreen;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
 
 public class AddQuoteController {
 
@@ -20,7 +18,7 @@ public class AddQuoteController {
         AddQuote.backButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                // We access this page from the header so we look there for the previous page
+                // We access this page from the header, so we look there for the previous page
                 BorderPane lastRoot = AddQuote.getLastRoot();
 
                 lastRoot.setTop(Header.getHeader());
@@ -36,7 +34,7 @@ public class AddQuoteController {
 
                 if(title.isEmpty() || quoteText.isEmpty()) {
                     AlertHelper.createAlert("Missing Title or Quote",
-                            "Enter a title and a quote.");
+                            "Enter a title and quote.");
                     return;
                 }
                 if(quoteText.length() < 45) {
@@ -64,5 +62,4 @@ public class AddQuoteController {
             }
         });
     }
-
 }

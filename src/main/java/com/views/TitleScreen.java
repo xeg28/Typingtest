@@ -23,7 +23,7 @@ public class TitleScreen {
     private static VBox shortcuts = new VBox();
 
     public static TextArea quoteTextArea = new TextArea();
-    public static Label wpmLabel = new Label("0.0 wpm");
+    public static Label wpmLabel = new Label("--- wpm");
     public static Button quoteListBtn = new Button("Select Quote");
     public static TextField testQuote = new TextField();
     public static Button testQuoteBtn = new Button("Test Quote");

@@ -229,7 +229,7 @@ public class TitleScreenController {
             highlightPause.stop();
         }
         testIsOngoing = false;
-        wpmLabel.setText("0.0 wpm");
+        wpmLabel.setText("--- wpm");
         quoteTextArea.deselect();
         userTyped = new StringBuilder();
     }
