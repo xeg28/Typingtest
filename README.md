@@ -17,5 +17,9 @@ This personal project is made to practice my ability to program in Java. This pr
 * This program also has a leaderboard for all saved quotes 
     * This keeps track of the top 5 users for all quotes.
 
+## How to try it out
+* You will need Java 17 to run the file
+* [Download file](https://github.com/xeg28/Typingtest/out/artifacts/Executable/Executable.jar)
+
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
