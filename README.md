@@ -19,7 +19,7 @@ This personal project is made to practice my ability to program in Java. This pr
 
 ## Try it out here
 * You will need Java 17 to run the file
-* [Download file]([./out/artifacts/Executable/Executable.jar](https://github.com/xeg28/Typingtest/raw/main/out/artifacts/Executable/Executable.jar)https://github.com/xeg28/Typingtest/raw/main/out/artifacts/Executable/Executable.jar)
+* [Download file]([./out/artifacts/Executable/Executable.jar](https://github.com/xeg28/Typingtest/raw/main/out/artifacts/Executable/Executable.jar)
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
