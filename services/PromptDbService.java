@@ -2,7 +2,7 @@ package services;
 
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.List;
 
 import Driver.Main;
 import helpers.MessageHelper;
@@ -34,6 +34,10 @@ public class PromptDbService {
             e.printStackTrace();
         }
         return response.toString();
+    }
+
+    public static int insert(List<String> column, List<String> value) {
+        return 0;
     }
 
 

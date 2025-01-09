@@ -3,6 +3,7 @@ package Driver;
 import helpers.MessageHelper;
 import helpers.StringHelper;
 import io.github.cdimascio.dotenv.Dotenv;
+import server.Listener;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -26,10 +27,7 @@ public class Main {
             e.printStackTrace();
         }
 
-        String response = MessageHelper.getResponse("102 1|1");
-        String[] table = StringHelper.deserialize(response, '\n');
-        for(String row : table) {
-            System.out.println(row);
-        }
+        new Listener().start();
+
     }
 }

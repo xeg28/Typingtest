@@ -32,4 +32,31 @@ public class UserDbService {
         }
         return row;
     }
+
+    public static String alterUser(Object[] values) {
+        Connection conn = Main.conn;
+        StringBuilder sql = new StringBuilder();
+        sql.append("UPDATE \"user\" ")
+                .append("SET totaltests = ?, averagewpm = ?, bestwpm = ? ")
+                .append("WHERE id = ?");
+        int userId = Integer.parseInt((String)values[1]);
+        int totalTests = Integer.parseInt((String)values[2]);
+        double averageWPM = Double.parseDouble((String)values[3]);
+        double bestWPM = Double.parseDouble((String)values[4]);
+        try {
+            PreparedStatement statement = conn.prepareStatement(sql.toString());
+            statement.setInt(1, totalTests);
+            statement.setDouble(2, averageWPM);
+            statement.setDouble(3, bestWPM);
+            statement.setInt(4, userId);
+            int value = statement.executeUpdate();
+            if(value != 1) return "-1";
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return "-1";
+        }
+        return "0";
+    }
+
+
 }

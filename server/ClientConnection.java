@@ -1,9 +1,8 @@
 package server;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import helpers.MessageHelper;
+
+import java.io.*;
 import java.net.Socket;
 import java.net.SocketException;
 
@@ -29,15 +28,20 @@ class ClientConnection extends Thread {
         try {
             InputStream input = socket.getInputStream();
             BufferedReader reader = new BufferedReader(new InputStreamReader(input));
-
+            OutputStream output = socket.getOutputStream();
+            PrintWriter writer = new PrintWriter(output, true);
             String text;
             do {
                 text = reader.readLine();
                 if(text == null) {
                     break;
                 }
-                String senderIp = socket.getInetAddress().getHostAddress();
-                int senderPort = socket.getPort();
+                System.out.println(text);
+                String response = MessageHelper.getResponse(text);
+                if(response != null) {
+                    writer.println(response);
+                }
+
             } while(true);
 
             socket.close();

@@ -13,7 +13,10 @@ public class StringHelper {
             }
             if (arg instanceof String) {
                 // Escape delimiter and backslash in strings
-                sb.append(((String) arg).replace("\\", "\\\\").replace("|", "\\|"));
+                sb.append(((String) arg).replace("\\", "\\\\")
+                                        .replace("|", "\\|")
+                                        .replace("~","\\~")
+                                        .replace("\n", "~"));
             } else {
                 // Append non-string values directly
                 sb.append(arg.toString());
@@ -29,7 +32,7 @@ public class StringHelper {
             if (sb.length() > 0) {
                 sb.append(delimiter); // Add a delimiter between values
             }
-            sb.append(((String) row).replace("\\", "\\\\").replace(""+delimiter, "\\"+delimiter));
+            sb.append((row).replace("\\", "\\\\").replace(""+delimiter, "\\"+delimiter));
         }
         return sb.toString();
     }
@@ -50,10 +53,12 @@ public class StringHelper {
 
         for (int i = 0; i < parts.length; i++) {
             // Unescape strings (restore escaped backslashes and delimiters)
-            result[i] = parts[i].replace("\\|", "|").replace("\\\\", "\\");
+            result[i] = parts[i].replace("\\|", "|")
+                                .replace("\\\\", "\\")
+                                .replaceAll("(?<!\\\\)~", "\n")
+                                .replaceAll("\\\\~", "~");
         }
         return result;
     }
-
 
 }
