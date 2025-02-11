@@ -1,20 +1,32 @@
 package Driver;
 
+import helpers.CryptoHelper;
 import helpers.MessageHelper;
-import helpers.StringHelper;
 import io.github.cdimascio.dotenv.Dotenv;
+import server.ClientConnection;
 import server.Listener;
 
+import java.net.Socket;
+import java.security.KeyPair;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class Main {
     public static Connection conn;
+    public static PrivateKey privateKey;
+    public static PublicKey publicKey;
     public static void main(String[] args) {
-        Dotenv dotenv = Dotenv.load(); // Loads the .env file
 
-        String dbUser = dotenv.get("DB_USER"); // Example: Retrieve a value
+        KeyPair keypair = CryptoHelper.generateKeyPair();
+        privateKey = keypair.getPrivate();
+        publicKey = keypair.getPublic();
+
+        Dotenv dotenv = Dotenv.load();
+
+        String dbUser = dotenv.get("DB_USER");
         String dbPass = dotenv.get("DB_PASSWORD");
         String dbHost = dotenv.get("DB_HOST");
         String dbPort = dotenv.get("DB_PORT");

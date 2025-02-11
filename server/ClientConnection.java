@@ -1,14 +1,19 @@
 package server;
 
+import Driver.Main;
 import helpers.MessageHelper;
 
 import java.io.*;
 import java.net.Socket;
 import java.net.SocketException;
+import java.security.PublicKey;
+import java.util.Base64;
 
-class ClientConnection extends Thread {
+public class ClientConnection extends Thread {
     private Socket socket;
     private int clientId;
+
+    public PublicKey clientPublicKey;
     public ClientConnection(Socket socket) {
         this.socket = socket;
         try {
@@ -17,6 +22,28 @@ class ClientConnection extends Thread {
             throw new RuntimeException(e);
         }
     }
+
+    public void setClientId(int id) {
+        this.clientId = id;
+    }
+
+    public int getClientId() {
+        return this.clientId;
+    }
+
+    public void sendPublicKey() {
+        OutputStream output = null;
+        PublicKey publicKey = Main.publicKey;
+        try {
+            output = socket.getOutputStream();
+            PrintWriter writer = new PrintWriter(output, true);
+            String publicKeyString = Base64.getEncoder().encodeToString(publicKey.getEncoded());
+            writer.println("000 " + publicKeyString);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
     /**
      * Creates a buffered reader from the sockets input stream
@@ -37,7 +64,8 @@ class ClientConnection extends Thread {
                     break;
                 }
                 System.out.println(text);
-                String response = MessageHelper.getResponse(text);
+                String response = MessageHelper.getResponse(text, this);
+                if(response != null && response.equals("000")) continue;
                 if(response != null) {
                     writer.println(response);
                 }
@@ -50,6 +78,8 @@ class ClientConnection extends Thread {
             System.out.println("Lost connection with " + socket.getRemoteSocketAddress());
         } catch (IOException ex) {
             System.out.println("Server exception: " + ex.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
         } finally {
             try{
                 socket.close();

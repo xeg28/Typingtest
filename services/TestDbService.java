@@ -77,16 +77,16 @@ public class TestDbService {
         return MessageHelper.createMessage(rows);
     }
 
-    public static long insert(List<String> values) {
+    public static String insert(Object[] values) {
         Connection conn = Main.conn;
         StringBuilder sql = new StringBuilder();
         sql.append("INSERT INTO test (userid, promptid, wpm)")
                     .append("VALUES(?, ? , ?)");
         try {
             PreparedStatement statement = conn.prepareStatement(sql.toString());
-            statement.setInt(1, Integer.parseInt(values.get(0)));
-            statement.setInt(2, Integer.parseInt(values.get(1)));
-            statement.setDouble(3, Double.parseDouble(values.get(2)));
+            statement.setInt(1, Integer.parseInt((String)values[1]));
+            statement.setInt(2, Integer.parseInt((String)values[2]));
+            statement.setDouble(3, Double.parseDouble((String)values[3]));
             // Execute the insert statement
             int affectedRows = statement.executeUpdate();
 
@@ -94,17 +94,17 @@ public class TestDbService {
                 // Get the generated key
                 try (ResultSet rs = statement.getGeneratedKeys()) {
                     if (rs.next()) {
-                        return rs.getLong(1);
+                        return Long.toString(rs.getLong(1));
                     }
                 }
             } else {
-                return -1;
+                return Long.toString(-1);
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            return -1;
+            return Long.toString(-1);
         }
 
-        return 0;
+        return Long.toString(0);
     }
 }

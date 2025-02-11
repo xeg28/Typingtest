@@ -1,41 +1,58 @@
 package helpers;
 
 
+import Driver.Main;
+import server.ClientConnection;
 import services.PromptDbService;
 import services.TestDbService;
 import services.UserDbService;
-
 import java.util.ArrayList;
 
 public class MessageHelper {
-    public static String getResponse(String message) {
+    public static String getResponse(String message, ClientConnection clientConnection) throws Exception {
         String operation = message.substring(0,3);
-
+        if(operation.equals("000")) {
+            String publicKeyString = message.substring(4);
+            clientConnection.clientPublicKey = CryptoHelper.getPublicKeyFromMessage(publicKeyString);
+            return "000";
+        }
+        String decryptedMessage = "";
+        String values = "";
+        Object[] updateValues = null;
+        int userId = clientConnection.getClientId();
+        if(message.length() > 3)  {
+            values = message.substring(4);
+        }
         switch(operation) {
             case "100":
-                String username = message.substring(4);
-                return "100 " + UserDbService.getUser(username);
+                decryptedMessage = CryptoHelper.decryptMessage(values, Main.privateKey);
+                Object[] credentials = StringHelper.deserialize(decryptedMessage);
+                String response = UserDbService.getUser(credentials, clientConnection);
+                return "100 " + CryptoHelper.encryptMessage(response, clientConnection.clientPublicKey);
             case "101":
                 return "101 " + PromptDbService.getAllPrompts();
             case "102":
-                Object[] attributes = StringHelper.deserialize(message.substring(4));
+                Object[] attributes = StringHelper.deserialize(values);
                 int userid = 0;
                 int prompt = 0;
                 if(attributes[0] instanceof String && attributes[1] instanceof String) {
                     userid = Integer.parseInt((String)attributes[0]);
                     prompt = Integer.parseInt((String)attributes[1]);
                 }
-                else return null;
+                else return "102 -108";
                 return "102 " + TestDbService.getAllTests(userid, prompt);
             case "103":
-                int promptId = Integer.parseInt(message.substring(4));
+                int promptId = Integer.parseInt(values);
                 return "103 " + TestDbService.getLeaderboard(promptId);
             case "200":
-                String values = message.substring(4);
-                return "200 " + handleInsert(operation, values);
+                return "200 " + handleInsert(values, clientConnection);
             case "300":
-                Object[] updateValues = StringHelper.deserialize(message.substring(4));
+                 updateValues = StringHelper.deserialize(values);
                 return "300 " + handleUpdate(updateValues);
+            case "400":
+                updateValues = StringHelper.deserialize(values);
+                int value = Integer.parseInt((String)updateValues[0]);
+                return "400 " + PromptDbService.delete(value, userId);
         }
         return null;
     }
@@ -51,62 +68,23 @@ public class MessageHelper {
         return "";
     }
 
-    private static String handleInsert(String operation, String message) {
-        StringBuilder currentString = new StringBuilder();
-        boolean stringFlag = false;
-        boolean escapedSymbol = false;
-        String table = "";
-        ArrayList<String> columns = new ArrayList<>();
-        ArrayList<String> values = new ArrayList<>();
-
-        for(char c : message.toCharArray()) {
-            if(stringFlag) {
-                if(!escapedSymbol && c == '\\') {
-                    escapedSymbol = true;
-                    continue;
-                }
-                if(!escapedSymbol && c == '\'') {
-                    stringFlag = false;
-                    continue;
-                }
-                if(escapedSymbol && c == '\\') {
-                    currentString.append(c);
-                    escapedSymbol = false;
-                    continue;
-                }
-
-                escapedSymbol = false;
-            }
-            else if(c == '?') {
-                table = currentString.toString();
-                currentString = new StringBuilder();
-                continue;
-            }
-            else if(c == ',') {
-                values.add(currentString.toString());
-                currentString = new StringBuilder();
-                continue;
-            }
-            else if(c == '\'') {
-                stringFlag = true;
-                continue;
-            }
-            currentString.append(c);
-        }
-        values.add(currentString.toString());
+    private static String handleInsert(String message, ClientConnection clientConnection) throws Exception {
+        Object[] values = StringHelper.deserialize(message);
+        String table = (String)values[0];
 
         switch(table) {
             case "user":
+                String userPass = CryptoHelper.decryptMessage((String)values[1], Main.privateKey);
+                String response = UserDbService.insert(StringHelper.deserialize(userPass));
+                return "user " + response;
             case "prompt":
+                return "prompt " + PromptDbService.insert(values);
             case "test":
-                return String.valueOf(TestDbService.insert(values));
+                return "test " + TestDbService.insert(values);
         }
         return "-1";
     }
 
-    private static void handleGet() {
-
-    }
 
     private static void handeDel() {
 

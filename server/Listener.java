@@ -21,7 +21,9 @@ public class Listener extends Thread {
         try {
             while(true) {
                 Socket socket = serverSocket.accept();
-                new ClientConnection(socket).start();
+                ClientConnection clientConnection = new ClientConnection(socket);
+                clientConnection.sendPublicKey();
+                clientConnection.start();
             }
         } catch(IOException e) {
             System.out.println("Server exception: " + e.getMessage());
